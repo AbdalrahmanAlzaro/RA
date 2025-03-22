@@ -3,6 +3,8 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { Eye, EyeOff, Star, UserPlus } from "lucide-react";
 import SocialAuthButtons from "../components/SocialAuthButtons";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+import Swal from "sweetalert2"; // Import SweetAlert2
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +16,7 @@ const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { login } = useAuth();
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,6 +41,17 @@ const SignUp = () => {
 
       if (response.data.token) {
         login(response.data.token);
+
+        // Show success alert
+        Swal.fire({
+          icon: "success",
+          title: "Signup Successful!",
+          text: "You have successfully created an account.",
+          confirmButtonText: "OK",
+        }).then(() => {
+          // Navigate to the home page after the alert is closed
+          navigate("/");
+        });
       } else {
         setError(response.data.message || "Signup failed");
       }
@@ -52,7 +66,7 @@ const SignUp = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-xl shadow-lg">
+      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-xl shadow-lg mt-[5rem] mb-[5rem]">
         <div className="text-center">
           <div className="flex justify-center mb-2">
             <div className="flex space-x-1">
