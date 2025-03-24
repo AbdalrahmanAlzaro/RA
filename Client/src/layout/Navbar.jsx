@@ -1,6 +1,16 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { User, LogIn, LogOut, Menu, X, Home, Info, Mail } from "lucide-react";
+import {
+  User,
+  LogIn,
+  LogOut,
+  Menu,
+  X,
+  Home,
+  Info,
+  Mail,
+  Package,
+} from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../assets/Logo.svg";
 
@@ -46,6 +56,13 @@ const Navbar = () => {
             >
               <Home size={18} />
               <span>Home</span>
+            </Link>
+            <Link
+              to="/product"
+              className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition-colors"
+            >
+              <Package size={18} />
+              <span>Product</span>
             </Link>
             <Link
               to="/about"
@@ -114,6 +131,13 @@ const Navbar = () => {
               >
                 <Home size={18} />
                 <span>Home</span>
+              </Link>
+              <Link
+                to="/product"
+                className="flex items-center space-x-2 py-2 px-2 text-gray-700 hover:bg-gray-100 hover:text-indigo-600 rounded-lg transition-colors"
+              >
+                <Package size={18} />
+                <span>Product</span>
               </Link>
               <Link
                 to="/about"

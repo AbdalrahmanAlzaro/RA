@@ -16,6 +16,8 @@ import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
+import Products from "./pages/Products";
+import AddProduct from "./pages/AddProduct";
 
 const AppContent = () => {
   const location = useLocation();
@@ -26,7 +28,6 @@ const AppContent = () => {
     "/reset-password",
   ];
 
-  // Check if the current path should hide the Navbar and Footer
   const shouldHideNavbarFooter = hideNavbarFooterPaths.some((path) =>
     location.pathname.startsWith(path)
   );
@@ -43,6 +44,8 @@ const AppContent = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
+        <Route path="/product" element={<Products />} />
+        <Route path="/product/add" element={<AddProduct />} />
       </Routes>
       {!shouldHideNavbarFooter && <Footer />}
     </>

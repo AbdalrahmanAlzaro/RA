@@ -1,6 +1,6 @@
 const { Product } = require("../models");
+const { Op } = require("sequelize");
 const jwt = require("jsonwebtoken");
-const upload = require("../utils/multer");
 
 const createProduct = async (req, res) => {
   try {
@@ -36,4 +36,61 @@ const createProduct = async (req, res) => {
   }
 };
 
-module.exports = { createProduct };
+const getAllProducts = async (req, res) => {
+  try {
+    const { category, subCategory, sort, search, page, limit } = req.query;
+
+    // Build filter object
+    const filter = {};
+    if (category) filter.category = category;
+    if (subCategory) filter.subCategory = subCategory;
+
+    // Add search functionality using Sequelize Op
+    if (search) {
+      const { Op } = require("sequelize");
+      filter[Op.or] = [
+        { title: { [Op.like]: `%${search}%` } },
+        { description: { [Op.like]: `%${search}%` } },
+      ];
+    }
+
+    // Pagination setup
+    const pageNumber = parseInt(page) || 1;
+    const itemsPerPage = parseInt(limit) || 10;
+    const offset = (pageNumber - 1) * itemsPerPage;
+
+    // Sorting
+    const order = [];
+    if (sort === "newest") {
+      order.push(["createdAt", "DESC"]);
+    } else if (sort === "oldest") {
+      order.push(["createdAt", "ASC"]);
+    } else if (sort === "price-low") {
+      order.push(["price", "ASC"]);
+    } else if (sort === "price-high") {
+      order.push(["price", "DESC"]);
+    }
+
+    const { count, rows: products } = await Product.findAndCountAll({
+      where: filter,
+      order,
+      limit: itemsPerPage,
+      offset,
+    });
+
+    res.status(200).json({
+      message: "Products retrieved successfully",
+      products,
+      totalCount: count,
+      currentPage: pageNumber,
+      totalPages: Math.ceil(count / itemsPerPage),
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Error retrieving products", error: error.message });
+  }
+};
+
+module.exports = { createProduct, getAllProducts };

@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const { createProduct } = require("../controllers/productController");
+const {
+  createProduct,
+  getAllProducts,
+} = require("../controllers/productController");
 const upload = require("../utils/multer");
 
 router.post(
@@ -11,5 +14,7 @@ router.post(
   ]),
   createProduct
 );
+
+router.get("/products", getAllProducts);
 
 module.exports = router;
