@@ -6,6 +6,7 @@ const dotenv = require("dotenv");
 
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
+const contactMessageRoutes = require("./routes/contactMessageRoutes");
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ app.use(passport.session());
 // Routes
 app.use("/auth", authRoutes);
 app.use("/api", userRoutes);
+app.use("/api", contactMessageRoutes);
 
 app.get("/", (req, res) => {
   res.send("Backend is running!");

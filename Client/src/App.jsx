@@ -14,6 +14,8 @@ import Home from "./pages/Home";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
+import Contact from "./pages/Contact";
+import About from "./pages/About";
 
 const AppContent = () => {
   const location = useLocation();
@@ -39,6 +41,8 @@ const AppContent = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/about" element={<About />} />
       </Routes>
       {!shouldHideNavbarFooter && <Footer />}
     </>
