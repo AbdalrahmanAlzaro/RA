@@ -204,7 +204,7 @@ const authController = {
       }
 
       const token = generateToken(user);
-      res.status(200).json({ token });
+      res.status(200).json({ token, user: { id: user.id, email: user.email } });
     } catch (error) {
       res
         .status(500)

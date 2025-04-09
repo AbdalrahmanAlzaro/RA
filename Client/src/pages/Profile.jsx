@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { User, Mail, Calendar, Edit, Camera } from "lucide-react";
 import Swal from "sweetalert2";
+import UserProduct from "../components/profile/userProduct";
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);
@@ -256,6 +257,7 @@ const Profile = () => {
           </div>
         )}
       </div>
+      <UserProduct />
     </div>
   );
 };

@@ -25,15 +25,6 @@ const Hero = () => {
               4.9 from 10,000+ reviews
             </span>
           </div>
-
-          <div className="pt-4 flex flex-col sm:flex-row gap-4">
-            <button className="bg-white hover:bg-gray-100 text-blue-700 font-bold py-3 px-6 rounded-lg transition-colors duration-200">
-              Browse Reviews
-            </button>
-            <button className="bg-transparent hover:bg-blue-500 text-white font-semibold py-3 px-6 border border-white rounded-lg transition-colors duration-200">
-              Write a Review
-            </button>
-          </div>
         </div>
 
         <div className="md:w-1/2 mt-8 md:mt-0">

@@ -130,7 +130,7 @@ const CategoryProductsPage = () => {
                 </h4>
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-indigo-600">
-                    ${product.price}
+                    {product.description}
                   </span>
                   <Link
                     to={`/products/${product.id}`}

@@ -33,7 +33,11 @@ const ProductDetails = () => {
   const [hoveredRating, setHoveredRating] = useState(0);
   const [previewImage, setPreviewImage] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [ratingStats, setRatingStats] = useState(null);
+  const [ratingStats, setRatingStats] = useState({
+    averageRating: 0,
+    numberOfRatings: 0,
+    error: null,
+  });
 
   useEffect(() => {
     const fetchRatingStats = async () => {
@@ -41,10 +45,35 @@ const ProductDetails = () => {
         const response = await axios.get(
           `http://localhost:4000/api/reviews/productRating/${id}`
         );
-        setRatingStats(response.data);
-        console.log(response.data);
+
+        // Check if response.data exists and has the expected structure
+        if (
+          response.data &&
+          typeof response.data.averageRating !== "undefined"
+        ) {
+          setRatingStats({
+            averageRating: response.data.averageRating,
+            numberOfRatings: response.data.numberOfRatings || 0,
+            error: null,
+          });
+        } else {
+          // Handle case where response.data doesn't have expected structure
+          setRatingStats((prev) => ({
+            ...prev,
+            error: "No rating data available",
+          }));
+        }
       } catch (err) {
-        setError("Failed to load product rating");
+        // Handle different types of errors
+        const errorMessage =
+          err.response?.data?.message ||
+          err.message ||
+          "Failed to load product rating";
+
+        setRatingStats((prev) => ({
+          ...prev,
+          error: errorMessage,
+        }));
       } finally {
         setLoading(false);
       }
@@ -266,25 +295,34 @@ const ProductDetails = () => {
           >
             {product.status}
           </div>
-          <div className="bg-gray-50 p-4 rounded-xl shadow-md max-w-sm border border-gray-100">
-            <h3 className="text-xl font-semibold mb-2 text-gray-800">
-              Product Rating
-            </h3>
-            <p className="flex items-center gap-2">
-              Average Rating:{" "}
-              <strong className="text-amber-500">
-                {ratingStats.averageRating}
-              </strong>
-              <span className="text-yellow-400 text-lg">⭐</span>
-            </p>
-            <p className="text-gray-600">
-              Rated by{" "}
-              <strong className="text-gray-800">
-                {ratingStats.numberOfRatings}
-              </strong>{" "}
-              user(s)
-            </p>
-          </div>
+          {ratingStats.numberOfRatings > 0 ? (
+            <div className="bg-gray-50 p-4 rounded-xl shadow-md max-w-sm border border-gray-100">
+              <h3 className="text-xl font-semibold mb-2 text-gray-800">
+                Product Rating
+              </h3>
+              <p className="flex items-center gap-2">
+                Average Rating:{" "}
+                <strong className="text-amber-500">
+                  {ratingStats.averageRating.toFixed(1)}
+                </strong>
+                <span className="text-yellow-400 text-lg">⭐</span>
+              </p>
+              <p className="text-gray-600">
+                Rated by{" "}
+                <strong className="text-gray-800">
+                  {ratingStats.numberOfRatings}
+                </strong>{" "}
+                user(s)
+              </p>
+            </div>
+          ) : (
+            <div className="bg-gray-50 p-4 rounded-xl shadow-md max-w-sm border border-gray-100">
+              <h3 className="text-xl font-semibold mb-2 text-gray-800">
+                Product Rating
+              </h3>
+              <p className="text-gray-600">No ratings yet</p>
+            </div>
+          )}
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12 p-8">
@@ -335,7 +373,7 @@ const ProductDetails = () => {
               <ArrowUpRight className="ml-3 text-indigo-600" size={28} />
             </h1>
 
-            <div className="flex items-center space-x-4 text-gray-600 bg-gray-50 px-4 py-2 rounded-lg inline-flex">
+            <div className="flex items-center space-x-4 text-gray-600 bg-gray-50 px-4 py-2 rounded-lg ">
               <CheckCircle className="text-green-500" size={20} />
               <span className="capitalize font-medium">{product.category}</span>
               {product.subCategory && (
@@ -524,7 +562,7 @@ const ProductDetails = () => {
               <label className="block text-base font-medium text-gray-700 mb-3">
                 Your Rating
               </label>
-              <div className="flex gap-2 bg-gray-50 p-3 rounded-xl inline-flex">
+              <div className="flex gap-2 bg-gray-50 p-3 rounded-xl ">
                 {[1, 2, 3, 4, 5].map((rating) => (
                   <button
                     key={rating}

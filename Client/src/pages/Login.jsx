@@ -37,8 +37,10 @@ const Login = () => {
         password: formData.password,
       });
 
-      if (response.data.token) {
-        login(response.data.token);
+      if (response.data.token && response.data.user) {
+        // Store token and user ID in localStorage via AuthContext
+        login(response.data.token, response.data.user);
+
         navigate("/"); // Navigate to the home page after successful login
       } else {
         setError(response.data.message || "Login failed");

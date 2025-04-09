@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ChevronDown, ChevronUp, HelpCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function FAQSection() {
   const [openIndex, setOpenIndex] = useState(null);
@@ -84,12 +85,12 @@ export default function FAQSection() {
 
         <div className="mt-10 text-center">
           <p className="text-gray-600">Can't find what you're looking for?</p>
-          <a
-            href="/contact"
+          <Link
+            to="/contact"
             className="inline-block mt-3 px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
           >
             Contact Support
-          </a>
+          </Link>
         </div>
       </div>
     </section>

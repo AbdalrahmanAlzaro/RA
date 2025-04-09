@@ -118,4 +118,43 @@ const getProductById = async (req, res) => {
   }
 };
 
-module.exports = { createProduct, getAllProducts, getProductById };
+const getUserProducts = async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+
+    const { page, limit } = req.query;
+
+    const pageNumber = parseInt(page) || 1;
+    const itemsPerPage = parseInt(limit) || 10;
+    const offset = (pageNumber - 1) * itemsPerPage;
+
+    const { count, rows: products } = await Product.findAndCountAll({
+      where: { userId },
+      limit: itemsPerPage,
+      offset,
+    });
+
+    res.status(200).json({
+      message: "User's products retrieved successfully",
+      products,
+      totalCount: count,
+      currentPage: pageNumber,
+      totalPages: Math.ceil(count / itemsPerPage),
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Error retrieving user's products",
+      error: error.message,
+    });
+  }
+};
+
+module.exports = {
+  createProduct,
+  getAllProducts,
+  getProductById,
+  getUserProducts,
+};
