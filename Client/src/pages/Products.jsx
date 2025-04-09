@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import {
   Package,
   Filter,
@@ -48,9 +49,6 @@ const Products = () => {
       const productsData = response.data.products;
       setProducts(productsData);
 
-      // Calculate total pages based on response
-      // Assuming your API returns total count in the response
-      // If not, you'll need to adjust this calculation
       const totalCount = response.data.totalCount || productsData.length;
       setTotalPages(Math.ceil(totalCount / itemsPerPage));
 
@@ -79,7 +77,7 @@ const Products = () => {
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters({ ...filters, [name]: value });
-    setCurrentPage(1); // Reset to first page when filters change
+    setCurrentPage(1);
   };
 
   const handleSearch = (e) => {
@@ -108,7 +106,7 @@ const Products = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen py-12">
+    <div className="bg-gray-50 min-h-screen mt-5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div className="flex justify-between items-center mb-8">
@@ -233,8 +231,6 @@ const Products = () => {
                   <option value="">None</option>
                   <option value="newest">Newest</option>
                   <option value="oldest">Oldest</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
                 </select>
               </div>
             </div>
@@ -323,9 +319,12 @@ const Products = () => {
                         day: "numeric",
                       })}
                     </span>
-                    <button className="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                    <Link
+                      to={`/products/${product.id}`}
+                      className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                    >
                       View Details
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -406,6 +405,36 @@ const Products = () => {
             </nav>
           </div>
         )}
+      </div>
+      <br />
+      {/* CTA Section */}
+      <div className="bg-blue-600">
+        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center lg:justify-between">
+          <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            <span className="block">Ready to experience better reviews?</span>
+            <span className="block text-blue-200">
+              Join our community today.
+            </span>
+          </h2>
+          <div className="mt-8 flex lg:mt-0 lg:flex-shrink-0">
+            <div className="inline-flex rounded-md shadow">
+              <Link
+                to="/signup"
+                className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50"
+              >
+                Sign Up
+              </Link>
+            </div>
+            <div className="ml-3 inline-flex rounded-md shadow">
+              <Link
+                to="/"
+                className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-800 hover:bg-blue-700"
+              >
+                Learn More
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

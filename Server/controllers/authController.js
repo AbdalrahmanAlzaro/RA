@@ -7,7 +7,7 @@ const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const FacebookStrategy = require("passport-facebook").Strategy;
 
-// Passport Google Strategy
+// Google Strategy
 passport.use(
   new GoogleStrategy(
     {
@@ -23,7 +23,7 @@ passport.use(
           user = await User.create({
             googleId: profile.id,
             name: profile.displayName,
-            email: profile.emails[0].value,
+            email: profile.emails?.[0]?.value,
           });
         }
 
@@ -35,7 +35,7 @@ passport.use(
   )
 );
 
-// Passport Facebook Strategy
+// Facebook Strategy
 passport.use(
   new FacebookStrategy(
     {
@@ -64,12 +64,8 @@ passport.use(
   )
 );
 
-// Passport Serialize User
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
-
-// Passport Deserialize User
+// Session handling
+passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser(async (id, done) => {
   try {
     const user = await User.findByPk(id);
@@ -79,30 +75,25 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
+// Helper to generate token
+const generateToken = (user) =>
+  jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: "1w" });
+
 const authController = {
   async signUp(req, res) {
     try {
       const { name, email, password } = req.body;
-      const trimmedEmail = email.trim();
-      const trimmedPassword = password.trim();
-
-      const existingUser = await User.findOne({
-        where: { email: trimmedEmail },
-      });
-      if (existingUser) {
+      const userExists = await User.findOne({ where: { email: email.trim() } });
+      if (userExists)
         return res.status(400).json({ message: "User already exists" });
-      }
 
-      const newUser = await User.create({
+      const user = await User.create({
         name,
-        email: trimmedEmail,
-        password: trimmedPassword,
+        email: email.trim(),
+        password: password.trim(),
       });
 
-      const token = jwt.sign({ id: newUser.id }, SECRET_KEY, {
-        expiresIn: "1w",
-      });
-
+      const token = generateToken(user);
       res.status(201).json({ token });
     } catch (error) {
       res
@@ -114,23 +105,12 @@ const authController = {
   async login(req, res) {
     try {
       const { email, password } = req.body;
-      const trimmedEmail = email.trim();
-      const trimmedPassword = password.trim();
-
-      const user = await User.findOne({ where: { email: trimmedEmail } });
-      if (!user) {
+      const user = await User.findOne({ where: { email: email.trim() } });
+      if (!user || !(await user.comparePassword(password.trim()))) {
         return res.status(400).json({ message: "Invalid credentials" });
       }
 
-      const isPasswordValid = await user.comparePassword(trimmedPassword);
-      if (!isPasswordValid) {
-        return res.status(400).json({ message: "Invalid credentials" });
-      }
-
-      const token = jwt.sign({ id: user.id }, SECRET_KEY, {
-        expiresIn: "1w",
-      });
-
+      const token = generateToken(user);
       res.status(200).json({ token });
     } catch (error) {
       res
@@ -142,17 +122,12 @@ const authController = {
   async forgotPassword(req, res) {
     try {
       const { email } = req.body;
-      const trimmedEmail = email.trim();
-
-      const user = await User.findOne({ where: { email: trimmedEmail } });
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
+      const user = await User.findOne({ where: { email: email.trim() } });
+      if (!user) return res.status(404).json({ message: "User not found" });
 
       const resetToken = jwt.sign({ id: user.id }, SECRET_KEY, {
         expiresIn: "1h",
       });
-
       user.resetPasswordToken = resetToken;
       user.resetPasswordExpires = Date.now() + 3600000;
       await user.save();
@@ -165,17 +140,12 @@ const authController = {
         },
       });
 
-      const mailOptions = {
+      await transporter.sendMail({
         to: user.email,
         from: process.env.EMAIL_USER,
         subject: "Password Reset",
-        text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
-          Please click on the following link, or paste this into your browser to complete the process:\n\n
-          http://localhost:5173/reset-password/${resetToken}\n\n
-          If you did not request this, please ignore this email and your password will remain unchanged.\n`,
-      };
-
-      await transporter.sendMail(mailOptions);
+        text: `Reset your password here: http://localhost:5173/reset-password/${resetToken}`,
+      });
 
       res.status(200).json({ message: "Password reset email sent" });
     } catch (error) {
@@ -189,8 +159,8 @@ const authController = {
   async resetPassword(req, res) {
     try {
       const { token, newPassword } = req.body;
-
       const decoded = jwt.verify(token, SECRET_KEY);
+
       const user = await User.findOne({
         where: {
           id: decoded.id,
@@ -199,9 +169,8 @@ const authController = {
         },
       });
 
-      if (!user) {
+      if (!user)
         return res.status(400).json({ message: "Invalid or expired token" });
-      }
 
       user.password = newPassword.trim();
       user.resetPasswordToken = null;
@@ -216,47 +185,47 @@ const authController = {
     }
   },
 
-  googleAuth: passport.authenticate("google", {
-    scope: ["profile", "email"],
-  }),
-
+  // Google auth
+  googleAuth: passport.authenticate("google", { scope: ["profile", "email"] }),
   googleAuthCallback: [
     passport.authenticate("google", { failureRedirect: "/login" }),
     (req, res) => {
-      try {
-        // Generate a JWT token
-        const token = jwt.sign({ id: req.user.id }, SECRET_KEY, {
-          expiresIn: "1w",
-        });
+      const token = jwt.sign({ id: req.user.id }, SECRET_KEY, {
+        expiresIn: "1w",
+      });
 
-        // Redirect to the frontend with the token
-        res.redirect(`http://localhost:5173?token=${token}`);
-      } catch (error) {
-        console.error("Error generating token:", error);
-        res.status(500).json({ message: "Error generating token", error });
-      }
+      const user = {
+        id: req.user.id,
+        name: req.user.name,
+        email: req.user.email,
+      };
+
+      const userEncoded = encodeURIComponent(JSON.stringify(user));
+      res.redirect(
+        `http://localhost:5173/oauth-success?token=${token}&user=${userEncoded}`
+      );
     },
   ],
 
-  facebookAuth: passport.authenticate("facebook", {
-    scope: ["email"],
-  }),
-
+  // Facebook auth
+  facebookAuth: passport.authenticate("facebook", { scope: ["email"] }),
   facebookAuthCallback: [
     passport.authenticate("facebook", { failureRedirect: "/login" }),
     (req, res) => {
-      try {
-        // Generate a JWT token
-        const token = jwt.sign({ id: req.user.id }, SECRET_KEY, {
-          expiresIn: "1w",
-        });
+      const token = jwt.sign({ id: req.user.id }, SECRET_KEY, {
+        expiresIn: "1w",
+      });
 
-        // Redirect to the frontend with the token
-        res.redirect(`http://localhost:5173?token=${token}`);
-      } catch (error) {
-        console.error("Error generating token:", error);
-        res.status(500).json({ message: "Error generating token", error });
-      }
+      const user = {
+        id: req.user.id,
+        name: req.user.name,
+        email: req.user.email,
+      };
+
+      const userEncoded = encodeURIComponent(JSON.stringify(user));
+      res.redirect(
+        `http://localhost:5173/oauth-success?token=${token}&user=${userEncoded}`
+      );
     },
   ],
 };

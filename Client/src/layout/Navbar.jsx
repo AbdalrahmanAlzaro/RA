@@ -10,6 +10,7 @@ import {
   Info,
   Mail,
   Package,
+  PlusCircle,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../assets/Logo.svg";
@@ -63,6 +64,13 @@ const Navbar = () => {
             >
               <Package size={18} />
               <span>Product</span>
+            </Link>
+            <Link
+              to="/product/add"
+              className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition-colors"
+            >
+              <PlusCircle size={18} />
+              <span>Add Product</span>
             </Link>
             <Link
               to="/about"
@@ -138,6 +146,13 @@ const Navbar = () => {
               >
                 <Package size={18} />
                 <span>Product</span>
+              </Link>
+              <Link
+                to="/product/add"
+                className="flex items-center space-x-2 py-2 px-2 text-gray-700 hover:bg-gray-100 hover:text-indigo-600 rounded-lg transition-colors"
+              >
+                <PlusCircle size={18} />
+                <span>Add Product</span>
               </Link>
               <Link
                 to="/about"

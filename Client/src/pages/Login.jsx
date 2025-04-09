@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { Eye, EyeOff, Star, LogIn } from "lucide-react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
 
 import SocialAuthButtons from "../components/SocialAuthButtons";
 
@@ -210,12 +210,12 @@ const Login = () => {
             <div className="text-center">
               <p className="text-sm text-gray-600">
                 Don't have an account?{" "}
-                <a
-                  href="/signup"
+                <Link
+                  to="/signup"
                   className="font-medium text-indigo-600 hover:text-indigo-500"
                 >
                   Sign up
-                </a>
+                </Link>
               </p>
             </div>
           </form>

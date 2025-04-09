@@ -18,6 +18,8 @@ import Contact from "./pages/Contact";
 import About from "./pages/About";
 import Products from "./pages/Products";
 import AddProduct from "./pages/AddProduct";
+import ProductDetails from "./pages/ProductDetails";
+import OAuthSuccessWrapper from "./components/OAuthSuccessWrapper";
 
 const AppContent = () => {
   const location = useLocation();
@@ -45,7 +47,9 @@ const AppContent = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
         <Route path="/product" element={<Products />} />
-        <Route path="/product/add" element={<AddProduct />} />
+        <Route path="/product/add" element={<AddProduct />} />{" "}
+        <Route path="/products/:id" element={<ProductDetails />} />
+        <Route path="/oauth-success" element={<OAuthSuccessWrapper />} />
       </Routes>
       {!shouldHideNavbarFooter && <Footer />}
     </>

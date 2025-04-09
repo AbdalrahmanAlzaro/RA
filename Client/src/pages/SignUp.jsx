@@ -3,7 +3,7 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { Eye, EyeOff, Star, UserPlus } from "lucide-react";
 import SocialAuthButtons from "../components/SocialAuthButtons";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
 import Swal from "sweetalert2"; // Import SweetAlert2
 
 const SignUp = () => {
@@ -219,12 +219,12 @@ const SignUp = () => {
           <div className="text-center">
             <p className="text-sm text-gray-600">
               Already have an account?{" "}
-              <a
-                href="/login"
+              <Link
+                to="/login"
                 className="font-medium text-indigo-600 hover:text-indigo-500"
               >
                 Sign in
-              </a>
+              </Link>
             </p>
           </div>
         </form>

@@ -39,36 +39,28 @@ const createProduct = async (req, res) => {
 const getAllProducts = async (req, res) => {
   try {
     const { category, subCategory, sort, search, page, limit } = req.query;
+    const { Op } = require("sequelize");
 
-    // Build filter object
-    const filter = {};
+    const filter = { status: "approved" };
     if (category) filter.category = category;
     if (subCategory) filter.subCategory = subCategory;
 
-    // Add search functionality using Sequelize Op
     if (search) {
-      const { Op } = require("sequelize");
       filter[Op.or] = [
         { title: { [Op.like]: `%${search}%` } },
         { description: { [Op.like]: `%${search}%` } },
       ];
     }
 
-    // Pagination setup
     const pageNumber = parseInt(page) || 1;
     const itemsPerPage = parseInt(limit) || 10;
     const offset = (pageNumber - 1) * itemsPerPage;
 
-    // Sorting
     const order = [];
     if (sort === "newest") {
       order.push(["createdAt", "DESC"]);
     } else if (sort === "oldest") {
       order.push(["createdAt", "ASC"]);
-    } else if (sort === "price-low") {
-      order.push(["price", "ASC"]);
-    } else if (sort === "price-high") {
-      order.push(["price", "DESC"]);
     }
 
     const { count, rows: products } = await Product.findAndCountAll({
@@ -93,4 +85,31 @@ const getAllProducts = async (req, res) => {
   }
 };
 
-module.exports = { createProduct, getAllProducts };
+const getProductById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const product = await Product.findByPk(id);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    const response = {
+      message: "Product retrieved successfully",
+      product: {
+        ...product.toJSON(),
+        otherImages: product.otherImages ? product.otherImages.split(",") : [],
+      },
+    };
+
+    res.status(200).json(response);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Error retrieving product", error: error.message });
+  }
+};
+
+module.exports = { createProduct, getAllProducts, getProductById };

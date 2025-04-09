@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   createProduct,
   getAllProducts,
+  getProductById,
 } = require("../controllers/productController");
 const upload = require("../utils/multer");
 
@@ -16,5 +17,7 @@ router.post(
 );
 
 router.get("/products", getAllProducts);
+
+router.get("/products/:id", getProductById);
 
 module.exports = router;
