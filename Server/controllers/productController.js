@@ -38,17 +38,23 @@ const createProduct = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
   try {
-    const { category, subCategory, sort, search, page, limit } = req.query;
+    const { category, subcategory, sort, search, page, limit } = req.query;
     const { Op } = require("sequelize");
 
     const filter = { status: "approved" };
-    if (category) filter.category = category;
-    if (subCategory) filter.subCategory = subCategory;
+
+    if (category) {
+      filter.category = { [Op.iLike]: `%${category}%` };
+    }
+
+    if (subcategory) {
+      filter.subCategory = { [Op.iLike]: `%${subcategory}%` };
+    }
 
     if (search) {
       filter[Op.or] = [
-        { title: { [Op.like]: `%${search}%` } },
-        { description: { [Op.like]: `%${search}%` } },
+        { title: { [Op.iLike]: `%${search}%` } },
+        { description: { [Op.iLike]: `%${search}%` } },
       ];
     }
 

@@ -22,6 +22,8 @@ import ProductDetails from "./pages/ProductDetails";
 import OAuthSuccessWrapper from "./components/OAuthSuccessWrapper";
 import OTPVerify from "./pages/OTPVerify";
 import { ArrowUp } from "lucide-react"; // Import the arrow icon from Lucide
+import CategoryProductsPage from "./pages/CategoryProductsPage";
+import CategoryPage from "./pages/CategoryPage";
 
 const ScrollToTopButton = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -93,6 +95,11 @@ const AppContent = () => {
         <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/oauth-success" element={<OAuthSuccessWrapper />} />
         <Route path="/verify-otp" element={<OTPVerify />} />
+        <Route
+          path="/category/:category/:subcategory"
+          element={<CategoryProductsPage />}
+        />
+        <Route path="/category/:category" element={<CategoryPage />} />
       </Routes>
       {!shouldHideNavbarFooter && <Footer />}
       <ScrollToTopButton />
