@@ -3,7 +3,7 @@ import { Star } from "lucide-react";
 
 const Hero = () => {
   return (
-    <div className="bg-gradient-to-r from-blue-600 to-indigo-700 py-16 px-4 sm:px-6 lg:px-8 rounded-lg shadow-xl">
+    <div className="bg-gradient-to-r from-blue-600 h-[38rem] to-purple-700 py-16 px-4 sm:px-6 lg:px-8 rounded-lg shadow-xl">
       <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-8">
         <div className="md:w-1/2 space-y-6">
           <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
@@ -39,7 +39,7 @@ const Hero = () => {
         <div className="md:w-1/2 mt-8 md:mt-0">
           <div className="relative">
             <img
-              src="https://img.freepik.com/free-photo/medium-shot-young-people-with-reviews_23-2149394417.jpg?ga=GA1.1.905776187.1727602890&semt=ais_keywords_boost"
+              src="https://img.freepik.com/premium-vector/icon-template-5-stars-approved-gentle-colors-web-banners-flyers-printing-postcards-invitat_678847-50.jpg?ga=GA1.1.905776187.1727602890&semt=ais_hybrid&w=740"
               alt="People reviewing products"
               className="rounded-lg shadow-lg object-cover"
             />

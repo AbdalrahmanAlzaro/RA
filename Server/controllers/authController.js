@@ -6,6 +6,7 @@ const { Op } = require("sequelize");
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const FacebookStrategy = require("passport-facebook").Strategy;
+const crypto = require("crypto");
 
 // Google Strategy
 passport.use(
@@ -79,26 +80,118 @@ passport.deserializeUser(async (id, done) => {
 const generateToken = (user) =>
   jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: "1w" });
 
+// Helper to send OTP email
+const sendOtpEmail = async (email, otp) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  await transporter.sendMail({
+    to: email,
+    from: process.env.EMAIL_USER,
+    subject: "Your OTP for email verification",
+    text: `Your OTP code is: ${otp}`,
+  });
+};
+
+// Auth Controller
 const authController = {
   async signUp(req, res) {
     try {
       const { name, email, password } = req.body;
+
+      // Check if the user already exists
       const userExists = await User.findOne({ where: { email: email.trim() } });
       if (userExists)
         return res.status(400).json({ message: "User already exists" });
 
+      // Generate OTP
+      const otp = crypto.randomInt(100000, 999999).toString();
+
+      // Create the user
       const user = await User.create({
         name,
         email: email.trim(),
         password: password.trim(),
       });
 
-      const token = generateToken(user);
-      res.status(201).json({ token });
+      // Set OTP on the created user
+      user.otp = otp;
+
+      // Save the user with OTP
+      await user.save();
+
+      // Send OTP email (ensure sendOtpEmail is defined correctly)
+      await sendOtpEmail(email, otp);
+
+      res
+        .status(201)
+        .json({ message: "Signup successful. Please verify your OTP." });
     } catch (error) {
       res
         .status(500)
         .json({ message: "Error signing up", error: error.message });
+    }
+  },
+
+  async verifyOtp(req, res) {
+    try {
+      const { email, otp } = req.body;
+      const user = await User.findOne({ where: { email: email.trim() } });
+
+      if (!user) return res.status(404).json({ message: "User not found" });
+
+      console.log("Stored OTP:", user.otp); // Log stored OTP
+      console.log("Provided OTP:", otp); // Log provided OTP
+
+      if (user.otp.trim() !== otp.trim()) {
+        return res.status(400).json({ message: "Invalid OTP" });
+      }
+
+      user.isEmailVerified = true;
+      user.otp = null; // Clear OTP after successful verification
+      await user.save();
+
+      const token = generateToken(user);
+      res.status(200).json({ message: "Email verified successfully", token });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Error verifying OTP", error: error.message });
+    }
+  },
+
+  async resendOtp(req, res) {
+    try {
+      const { email } = req.body;
+
+      // Check if the user exists
+      const user = await User.findOne({ where: { email: email.trim() } });
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Generate a new OTP
+      const otp = crypto.randomInt(100000, 999999).toString();
+
+      // Update the user's OTP
+      user.otp = otp;
+      await user.save();
+
+      // Send OTP email
+      await sendOtpEmail(email, otp);
+
+      res
+        .status(200)
+        .json({ message: "OTP resent successfully. Please check your email." });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Error resending OTP", error: error.message });
     }
   },
 

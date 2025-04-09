@@ -39,26 +39,48 @@ const SignUp = () => {
         password: formData.password,
       });
 
-      if (response.data.token) {
-        login(response.data.token);
-
-        // Show success alert
-        Swal.fire({
-          icon: "success",
-          title: "Signup Successful!",
-          text: "You have successfully created an account.",
-          confirmButtonText: "OK",
-        }).then(() => {
-          // Navigate to the home page after the alert is closed
+      // Successful response (2xx status)
+      if (response.status === 201) {
+        // Check if the response contains the OTP message
+        if (response.data.message?.includes("OTP")) {
+          await Swal.fire({
+            icon: "info",
+            title: "OTP Verification Required",
+            text: response.data.message,
+            confirmButtonText: "OK",
+          });
+          navigate("/verify-otp", { state: { email: formData.email } });
+        } else if (response.data.token) {
+          login(response.data.token);
           navigate("/");
-        });
-      } else {
-        setError(response.data.message || "Signup failed");
+        }
       }
     } catch (error) {
-      setError(
-        error.response?.data?.message || "An error occurred. Please try again."
-      );
+      // This handles network errors or server errors (4xx/5xx)
+      if (error.response) {
+        // Server responded with an error status
+        if (
+          error.response.status === 201 &&
+          error.response.data?.message?.includes("OTP")
+        ) {
+          // Special case: 201 status but in error object
+          await Swal.fire({
+            icon: "info",
+            title: "OTP Verification Required",
+            text: error.response.data.message,
+            confirmButtonText: "OK",
+          });
+          navigate("/verify-otp", { state: { email: formData.email } });
+        } else {
+          // Actual error case
+          setError(
+            error.response.data?.message || "An error occurred during signup"
+          );
+        }
+      } else {
+        // Network error or other issues
+        setError("Network error. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

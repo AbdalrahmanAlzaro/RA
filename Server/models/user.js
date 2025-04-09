@@ -13,6 +13,11 @@ module.exports = (sequelize, DataTypes) => {
       name: DataTypes.STRING,
       email: DataTypes.STRING,
       password: DataTypes.STRING,
+      otp: {
+        // Add OTP field here
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       googleId: {
         type: DataTypes.STRING,
         allowNull: true,

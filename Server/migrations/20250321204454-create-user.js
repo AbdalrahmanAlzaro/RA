@@ -18,6 +18,11 @@ module.exports = {
       password: {
         type: Sequelize.STRING,
       },
+      otp: {
+        // Add OTP field here
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       resetPasswordToken: {
         type: Sequelize.STRING,
         allowNull: true,
