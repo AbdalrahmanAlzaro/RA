@@ -21,4 +21,6 @@ router.get("/allReviews", reviewController.getAllReviews);
 
 router.get("/productRating/:productId", reviewController.getProductRatingStats);
 
+router.get("/myReviews", reviewController.getUserReviews);
+
 module.exports = router;

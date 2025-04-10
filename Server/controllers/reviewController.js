@@ -183,3 +183,34 @@ exports.getProductRatingStats = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+exports.getUserReviews = async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ message: "Authorization token missing" });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+
+    const reviews = await Review.findAll({
+      where: { userId },
+      include: [
+        {
+          association: "Product",
+          attributes: ["id", "title"],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    return res.status(200).json(reviews);
+  } catch (error) {
+    console.error("Error fetching user reviews:", error);
+    if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
