@@ -132,6 +132,92 @@ const getAllProducts = async (req, res) => {
   }
 };
 
+const getAllProducts11 = async (req, res) => {
+  try {
+    const { category, subcategory, sort, search, page, limit } = req.query;
+    const { Op } = require("sequelize");
+
+    const filter = {};
+
+    if (category) {
+      const normalizedCategory = categories.find(
+        (c) => c.toLowerCase() === category.toLowerCase()
+      );
+      if (!normalizedCategory) {
+        return res.status(400).json({ message: "Invalid category" });
+      }
+      filter.category = { [Op.iLike]: normalizedCategory };
+    }
+
+    if (subcategory) {
+      if (category) {
+        const normalizedCategory = categories.find(
+          (c) => c.toLowerCase() === category.toLowerCase()
+        );
+        const validSubcategories = subCategoriesMap[normalizedCategory] || [];
+        const normalizedSubcategory = validSubcategories.find(
+          (sc) => sc.toLowerCase() === subcategory.toLowerCase()
+        );
+
+        if (!normalizedSubcategory) {
+          return res.status(400).json({
+            message: "Invalid subcategory for the specified category",
+          });
+        }
+        filter.subCategory = { [Op.iLike]: normalizedSubcategory };
+      } else {
+        const allSubcategories = Object.values(subCategoriesMap).flat();
+        const normalizedSubcategory = allSubcategories.find(
+          (sc) => sc.toLowerCase() === subcategory.toLowerCase()
+        );
+
+        if (!normalizedSubcategory) {
+          return res.status(400).json({ message: "Invalid subcategory" });
+        }
+        filter.subCategory = { [Op.iLike]: normalizedSubcategory };
+      }
+    }
+
+    if (search) {
+      filter[Op.or] = [
+        { title: { [Op.iLike]: `%${search}%` } },
+        { description: { [Op.iLike]: `%${search}%` } },
+      ];
+    }
+
+    const pageNumber = parseInt(page) || 1;
+    const itemsPerPage = parseInt(limit) || 10;
+    const offset = (pageNumber - 1) * itemsPerPage;
+
+    const order = [];
+    if (sort === "newest") {
+      order.push(["createdAt", "DESC"]);
+    } else if (sort === "oldest") {
+      order.push(["createdAt", "ASC"]);
+    }
+
+    const { count, rows: products } = await Product.findAndCountAll({
+      where: filter,
+      order,
+      limit: itemsPerPage,
+      offset,
+    });
+
+    res.status(200).json({
+      message: "Products retrieved successfully",
+      products,
+      totalCount: count,
+      currentPage: pageNumber,
+      totalPages: Math.ceil(count / itemsPerPage),
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Error retrieving products", error: error.message });
+  }
+};
+
 const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -193,9 +279,42 @@ const getUserProducts = async (req, res) => {
   }
 };
 
+const updateProductStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const allowedStatuses = ["pending", "approved", "rejected"];
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({ message: "Invalid status value" });
+    }
+
+    const product = await Product.findByPk(id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    product.status = status;
+    await product.save();
+
+    res.status(200).json({
+      message: "Product status updated successfully",
+      product,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Error updating product status",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createProduct,
   getAllProducts,
   getProductById,
   getUserProducts,
+  updateProductStatus,
+  getAllProducts11,
 };

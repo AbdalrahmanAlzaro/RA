@@ -273,7 +273,7 @@ const ProductDetails = () => {
         }
       );
 
-      if (response.data.success) {
+      if (response.status === 201) {
         alert("Review reported successfully");
         closeReportModal();
       } else {

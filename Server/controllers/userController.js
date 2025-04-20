@@ -54,7 +54,25 @@ const updateUserData = async (req, res) => {
   }
 };
 
+const getAllUsersData = async (req, res) => {
+  try {
+    const users = await User.findAll({
+      attributes: { exclude: ["password"] },
+    });
+
+    if (!users.length) {
+      return res.status(404).json({ message: "No users found" });
+    }
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   getUserData,
   updateUserData,
+  getAllUsersData,
 };
