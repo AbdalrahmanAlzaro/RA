@@ -2,6 +2,16 @@ const { Product } = require("../models");
 const { Op } = require("sequelize");
 const jwt = require("jsonwebtoken");
 
+const categories = ["Electronics", "Clothing", "Furniture", "Books", "Other"];
+
+const subCategoriesMap = {
+  Electronics: ["Smartphones", "Laptops", "Cameras", "Accessories"],
+  Clothing: ["Men", "Women", "Kids", "Sportswear"],
+  Furniture: ["Living Room", "Bedroom", "Office", "Kitchen"],
+  Books: ["Fiction", "Non-fiction", "Educational", "Comics"],
+  Other: ["Miscellaneous"],
+};
+
 const createProduct = async (req, res) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
@@ -44,11 +54,42 @@ const getAllProducts = async (req, res) => {
     const filter = { status: "approved" };
 
     if (category) {
-      filter.category = { [Op.iLike]: `%${category}%` };
+      const normalizedCategory = categories.find(
+        (c) => c.toLowerCase() === category.toLowerCase()
+      );
+      if (!normalizedCategory) {
+        return res.status(400).json({ message: "Invalid category" });
+      }
+      filter.category = { [Op.iLike]: normalizedCategory };
     }
 
     if (subcategory) {
-      filter.subCategory = { [Op.iLike]: `%${subcategory}%` };
+      if (category) {
+        const normalizedCategory = categories.find(
+          (c) => c.toLowerCase() === category.toLowerCase()
+        );
+        const validSubcategories = subCategoriesMap[normalizedCategory] || [];
+        const normalizedSubcategory = validSubcategories.find(
+          (sc) => sc.toLowerCase() === subcategory.toLowerCase()
+        );
+
+        if (!normalizedSubcategory) {
+          return res.status(400).json({
+            message: "Invalid subcategory for the specified category",
+          });
+        }
+        filter.subCategory = { [Op.iLike]: normalizedSubcategory };
+      } else {
+        const allSubcategories = Object.values(subCategoriesMap).flat();
+        const normalizedSubcategory = allSubcategories.find(
+          (sc) => sc.toLowerCase() === subcategory.toLowerCase()
+        );
+
+        if (!normalizedSubcategory) {
+          return res.status(400).json({ message: "Invalid subcategory" });
+        }
+        filter.subCategory = { [Op.iLike]: normalizedSubcategory };
+      }
     }
 
     if (search) {

@@ -13,6 +13,7 @@ import {
   Trash2,
   Send,
   MessageSquare,
+  Flag,
 } from "lucide-react";
 
 const ProductDetails = () => {
@@ -38,6 +39,11 @@ const ProductDetails = () => {
     numberOfRatings: 0,
     error: null,
   });
+  const [reportData, setReportData] = useState({
+    reviewId: null,
+    reason: "",
+    showModal: false,
+  });
 
   useEffect(() => {
     const fetchRatingStats = async () => {
@@ -46,7 +52,6 @@ const ProductDetails = () => {
           `http://localhost:4000/api/reviews/productRating/${id}`
         );
 
-        // Check if response.data exists and has the expected structure
         if (
           response.data &&
           typeof response.data.averageRating !== "undefined"
@@ -57,14 +62,12 @@ const ProductDetails = () => {
             error: null,
           });
         } else {
-          // Handle case where response.data doesn't have expected structure
           setRatingStats((prev) => ({
             ...prev,
             error: "No rating data available",
           }));
         }
       } catch (err) {
-        // Handle different types of errors
         const errorMessage =
           err.response?.data?.message ||
           err.message ||
@@ -84,7 +87,6 @@ const ProductDetails = () => {
 
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user?.id;
-
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -172,7 +174,6 @@ const ProductDetails = () => {
       }
       setReviewForm({ title: "", description: "", rating: "", image: null });
       setEditingReviewId(null);
-      // Refresh reviews
       const reviewsRes = await axios.get(
         "http://localhost:4000/api/reviews/allReviews"
       );
@@ -228,6 +229,61 @@ const ProductDetails = () => {
     }
   };
 
+  // Report functionality
+  const openReportModal = (reviewId) => {
+    setReportData({
+      reviewId,
+      reason: "",
+      showModal: true,
+    });
+  };
+
+  const closeReportModal = () => {
+    setReportData({
+      reviewId: null,
+      reason: "",
+      showModal: false,
+    });
+  };
+
+  const handleReportReasonChange = (e) => {
+    setReportData({
+      ...reportData,
+      reason: e.target.value,
+    });
+  };
+
+  const submitReport = async () => {
+    if (!reportData.reason.trim()) {
+      alert("Please provide a reason for reporting this review");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/create-report",
+        {
+          reviewId: reportData.reviewId,
+          reason: reportData.reason,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        alert("Review reported successfully");
+        closeReportModal();
+      } else {
+        alert("Failed to report review");
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || "Error reporting review");
+    }
+  };
+
   const images = product
     ? [product.mainImage, ...(product.otherImages || [])]
     : [];
@@ -272,6 +328,50 @@ const ProductDetails = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-16 px-4 sm:px-6 lg:px-8">
+      {/* Report Modal */}
+      {reportData.showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-gray-800">Report Review</h3>
+              <button
+                onClick={closeReportModal}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-2">
+                Reason for reporting:
+              </label>
+              <textarea
+                value={reportData.reason}
+                onChange={handleReportReasonChange}
+                placeholder="Please explain why you're reporting this review..."
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                rows={4}
+              />
+            </div>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={closeReportModal}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={submitReport}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+              >
+                <Flag size={16} />
+                Submit Report
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -496,24 +596,34 @@ const ProductDetails = () => {
                       <span>{formatDate(review.createdAt)}</span>
                     </div>
 
-                    {review.User?.id === userId && (
-                      <div className="flex gap-4">
+                    <div className="flex gap-4">
+                      {review.User?.id === userId ? (
+                        <>
+                          <button
+                            onClick={() => handleEdit(review)}
+                            className="text-indigo-600 hover:text-indigo-800 flex items-center gap-1 text-sm font-medium transition-colors duration-200 hover:bg-indigo-50 px-3 py-1 rounded-lg"
+                          >
+                            <Edit size={16} />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            onClick={() => handleDelete(review.id)}
+                            className="text-red-600 hover:text-red-800 flex items-center gap-1 text-sm font-medium transition-colors duration-200 hover:bg-red-50 px-3 py-1 rounded-lg"
+                          >
+                            <Trash2 size={16} />
+                            <span>Delete</span>
+                          </button>
+                        </>
+                      ) : (
                         <button
-                          onClick={() => handleEdit(review)}
-                          className="text-indigo-600 hover:text-indigo-800 flex items-center gap-1 text-sm font-medium transition-colors duration-200 hover:bg-indigo-50 px-3 py-1 rounded-lg"
+                          onClick={() => openReportModal(review.id)}
+                          className="text-gray-600 hover:text-red-600 flex items-center gap-1 text-sm font-medium transition-colors duration-200 hover:bg-gray-50 px-3 py-1 rounded-lg"
                         >
-                          <Edit size={16} />
-                          <span>Edit</span>
+                          <Flag size={16} />
+                          <span>Report</span>
                         </button>
-                        <button
-                          onClick={() => handleDelete(review.id)}
-                          className="text-red-600 hover:text-red-800 flex items-center gap-1 text-sm font-medium transition-colors duration-200 hover:bg-red-50 px-3 py-1 rounded-lg"
-                        >
-                          <Trash2 size={16} />
-                          <span>Delete</span>
-                        </button>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}

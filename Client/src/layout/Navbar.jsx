@@ -13,7 +13,7 @@ import {
   PlusCircle,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import Logo from "../assets/ratenest-high-resolution-logo (1).png";
+import Logo from "../assets/Logo.svg";
 
 const Navbar = () => {
   const { token, logout } = useAuth();

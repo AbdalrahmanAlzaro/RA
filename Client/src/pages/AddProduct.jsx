@@ -24,10 +24,8 @@ const AddProduct = () => {
   const [success, setSuccess] = useState(false);
   const formRef = useRef(null);
 
-  // Predefined categories for dropdown
   const categories = ["Electronics", "Clothing", "Furniture", "Books", "Other"];
 
-  // Sub-categories mapping
   const subCategoriesMap = {
     Electronics: ["Smartphones", "Laptops", "Cameras", "Accessories"],
     Clothing: ["Men", "Women", "Kids", "Sportswear"],

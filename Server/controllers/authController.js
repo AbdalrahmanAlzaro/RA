@@ -157,7 +157,7 @@ const authController = {
       await user.save();
 
       const token = generateToken(user);
-      res.status(200).json({ message: "Email verified successfully", token });
+      res.status(200).json({ token, user: { id: user.id, email: user.email } });
     } catch (error) {
       res
         .status(500)
