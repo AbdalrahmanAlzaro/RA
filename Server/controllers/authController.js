@@ -76,11 +76,9 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-// Helper to generate token
 const generateToken = (user) =>
   jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: "1w" });
 
-// Helper to send OTP email
 const sendOtpEmail = async (email, otp) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -98,34 +96,27 @@ const sendOtpEmail = async (email, otp) => {
   });
 };
 
-// Auth Controller
 const authController = {
   async signUp(req, res) {
     try {
       const { name, email, password } = req.body;
 
-      // Check if the user already exists
       const userExists = await User.findOne({ where: { email: email.trim() } });
       if (userExists)
         return res.status(400).json({ message: "User already exists" });
 
-      // Generate OTP
       const otp = crypto.randomInt(100000, 999999).toString();
 
-      // Create the user
       const user = await User.create({
         name,
         email: email.trim(),
         password: password.trim(),
       });
 
-      // Set OTP on the created user
       user.otp = otp;
 
-      // Save the user with OTP
       await user.save();
 
-      // Send OTP email (ensure sendOtpEmail is defined correctly)
       await sendOtpEmail(email, otp);
 
       res
@@ -145,15 +136,12 @@ const authController = {
 
       if (!user) return res.status(404).json({ message: "User not found" });
 
-      console.log("Stored OTP:", user.otp); // Log stored OTP
-      console.log("Provided OTP:", otp); // Log provided OTP
-
       if (user.otp.trim() !== otp.trim()) {
         return res.status(400).json({ message: "Invalid OTP" });
       }
 
       user.isEmailVerified = true;
-      user.otp = null; // Clear OTP after successful verification
+      user.otp = null;
       await user.save();
 
       const token = generateToken(user);
@@ -169,20 +157,16 @@ const authController = {
     try {
       const { email } = req.body;
 
-      // Check if the user exists
       const user = await User.findOne({ where: { email: email.trim() } });
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Generate a new OTP
       const otp = crypto.randomInt(100000, 999999).toString();
 
-      // Update the user's OTP
       user.otp = otp;
       await user.save();
 
-      // Send OTP email
       await sendOtpEmail(email, otp);
 
       res
@@ -204,7 +188,12 @@ const authController = {
       }
 
       const token = generateToken(user);
-      res.status(200).json({ token, user: { id: user.id, email: user.email } });
+      res
+        .status(200)
+        .json({
+          token,
+          user: { id: user.id, email: user.email, role: user.role },
+        });
     } catch (error) {
       res
         .status(500)

@@ -37,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
         validate: {
           isUrl: {
             protocols: ["http", "https"],
-            require_tld: false, // <-- this line allows localhost
+            require_tld: false,
             require_protocol: true,
           },
         },

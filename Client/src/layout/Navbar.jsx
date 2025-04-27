@@ -11,7 +11,8 @@ import {
   Mail,
   Package,
   PlusCircle,
-} from "lucide-react";
+  Briefcase,
+} from "lucide-react"; // Added Briefcase icon
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../assets/Logo.svg";
 
@@ -37,7 +38,6 @@ const Navbar = () => {
           <div className="flex items-center space-x-2">
             <div className="flex items-center py-2">
               <Link to="/">
-                {" "}
                 <img
                   src={Logo}
                   alt="Logo"
@@ -71,6 +71,13 @@ const Navbar = () => {
             >
               <PlusCircle size={18} />
               <span>Add Product</span>
+            </Link>
+            <Link
+              to="/become-business"
+              className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition-colors"
+            >
+              <Briefcase size={18} />
+              <span>Become a Business</span>
             </Link>
             <Link
               to="/about"
@@ -153,6 +160,13 @@ const Navbar = () => {
               >
                 <PlusCircle size={18} />
                 <span>Add Product</span>
+              </Link>
+              <Link
+                to="/become-business"
+                className="flex items-center space-x-2 py-2 px-2 text-gray-700 hover:bg-gray-100 hover:text-indigo-600 rounded-lg transition-colors"
+              >
+                <Briefcase size={18} />
+                <span>Become a Business</span>
               </Link>
               <Link
                 to="/about"

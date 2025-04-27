@@ -21,14 +21,14 @@ import AddProduct from "./pages/AddProduct";
 import ProductDetails from "./pages/ProductDetails";
 import OAuthSuccessWrapper from "./components/OAuthSuccessWrapper";
 import OTPVerify from "./pages/OTPVerify";
-import { ArrowUp } from "lucide-react"; // Import the arrow icon from Lucide
+import { ArrowUp } from "lucide-react";
 import CategoryProductsPage from "./pages/CategoryProductsPage";
 import CategoryPage from "./pages/CategoryPage";
+import Business from "./pages/Business";
 
 const ScrollToTopButton = () => {
   const [isVisible, setIsVisible] = useState(false);
 
-  // Show button when page is scrolled down
   const toggleVisibility = () => {
     if (window.pageYOffset > 300) {
       setIsVisible(true);
@@ -37,7 +37,6 @@ const ScrollToTopButton = () => {
     }
   };
 
-  // Scroll to top smoothly
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -95,6 +94,7 @@ const AppContent = () => {
         <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/oauth-success" element={<OAuthSuccessWrapper />} />
         <Route path="/verify-otp" element={<OTPVerify />} />
+        <Route path="/become-business" element={<Business />} />
         <Route
           path="/category/:category/:subcategory"
           element={<CategoryProductsPage />}

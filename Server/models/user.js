@@ -6,6 +6,11 @@ module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
       User.hasMany(models.Review, { foreignKey: "userId" });
+      User.belongsToMany(models.Subscription, {
+        through: "UserSubscriptions",
+        foreignKey: "userId",
+        otherKey: "subscriptionId",
+      });
     }
   }
   User.init(
@@ -13,8 +18,12 @@ module.exports = (sequelize, DataTypes) => {
       name: DataTypes.STRING,
       email: DataTypes.STRING,
       password: DataTypes.STRING,
+      role: {
+        type: DataTypes.ENUM("user", "business", "admin"),
+        defaultValue: "user",
+        allowNull: false,
+      },
       otp: {
-        // Add OTP field here
         type: DataTypes.STRING,
         allowNull: true,
       },

@@ -18,8 +18,12 @@ module.exports = {
       password: {
         type: Sequelize.STRING,
       },
+      role: {
+        type: Sequelize.ENUM("user", "business", "admin"),
+        defaultValue: "user",
+        allowNull: false,
+      },
       otp: {
-        // Add OTP field here
         type: Sequelize.STRING,
         allowNull: true,
       },
