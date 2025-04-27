@@ -18,8 +18,15 @@ const createProduct = async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id;
 
-    const { title, description, category, subCategory, address, contact } =
-      req.body;
+    const {
+      title,
+      description,
+      category,
+      subCategory,
+      address,
+      contact,
+      productUrl,
+    } = req.body;
 
     const mainImage = req.files["mainImage"][0].path;
     const otherImages = req.files["otherImages"].map((file) => file.path);
@@ -33,6 +40,7 @@ const createProduct = async (req, res) => {
       subCategory,
       address: address || null,
       contact: contact || null,
+      productUrl: productUrl || null, // Added productUrl
       status: "pending",
       userId,
     });
@@ -96,6 +104,7 @@ const getAllProducts = async (req, res) => {
       filter[Op.or] = [
         { title: { [Op.iLike]: `%${search}%` } },
         { description: { [Op.iLike]: `%${search}%` } },
+        { productUrl: { [Op.iLike]: `%${search}%` } }, // Added productUrl to search
       ];
     }
 
@@ -182,6 +191,7 @@ const getAllProducts11 = async (req, res) => {
       filter[Op.or] = [
         { title: { [Op.iLike]: `%${search}%` } },
         { description: { [Op.iLike]: `%${search}%` } },
+        { productUrl: { [Op.iLike]: `%${search}%` } }, // Added productUrl to search
       ];
     }
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import {
   ChevronLeft,
@@ -493,6 +493,18 @@ const ProductDetails = () => {
               <p className="leading-relaxed text-gray-600">
                 {product.description}
               </p>
+            </div>
+
+            <div className="prose max-w-none text-gray-700">
+              <h3 className="text-xl font-semibold text-gray-800 mb-3">
+                Web Site
+              </h3>
+              <Link
+                to={product.productUrl}
+                className="leading-relaxed text-gray-600"
+              >
+                {product.productUrl}
+              </Link>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6 pt-6 border-t border-gray-100">

@@ -30,6 +30,18 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         defaultValue: "pending",
       },
+      productUrl: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: true,
+        validate: {
+          isUrl: {
+            protocols: ["http", "https"],
+            require_tld: false, // <-- this line allows localhost
+            require_protocol: true,
+          },
+        },
+      },
       userId: DataTypes.INTEGER,
     },
     {

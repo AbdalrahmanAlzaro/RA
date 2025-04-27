@@ -28,15 +28,20 @@ module.exports = {
       },
       address: {
         type: Sequelize.STRING,
-        allowNull: true, // Make address optional
+        allowNull: true,
       },
       contact: {
         type: Sequelize.STRING,
-        allowNull: true, // Make contact optional
+        allowNull: true,
       },
       status: {
         type: Sequelize.STRING,
-        defaultValue: "pending", // Set default value to 'pending'
+        defaultValue: "pending",
+      },
+      productUrl: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        unique: true,
       },
       userId: {
         type: Sequelize.INTEGER,

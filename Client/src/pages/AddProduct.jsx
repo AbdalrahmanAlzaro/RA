@@ -1,7 +1,15 @@
 import React, { useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Upload, X, Check, AlertCircle, Image, Package } from "lucide-react";
+import {
+  Upload,
+  X,
+  Check,
+  AlertCircle,
+  Image,
+  Package,
+  Link,
+} from "lucide-react";
 import Swal from "sweetalert2";
 
 const AddProduct = () => {
@@ -14,6 +22,7 @@ const AddProduct = () => {
     subCategory: "",
     address: "",
     contact: "",
+    productUrl: "", // Added productUrl to form state
   });
   const [mainImage, setMainImage] = useState(null);
   const [mainImagePreview, setMainImagePreview] = useState(null);
@@ -129,6 +138,7 @@ const AddProduct = () => {
     data.append("subCategory", formData.subCategory);
     data.append("address", formData.address);
     data.append("contact", formData.contact);
+    data.append("productUrl", formData.productUrl); // Added productUrl to form data
     data.append("mainImage", mainImage);
     otherImages.forEach((file) => {
       data.append("otherImages", file);
@@ -157,6 +167,7 @@ const AddProduct = () => {
         subCategory: "",
         address: "",
         contact: "",
+        productUrl: "", // Reset productUrl
       });
       setMainImage(null);
       setMainImagePreview(null);
@@ -173,19 +184,16 @@ const AddProduct = () => {
         text: "Product created successfully",
         icon: "success",
         confirmButtonText: "OK",
-        timer: 2000, // Auto close after 2 seconds
+        timer: 2000,
         timerProgressBar: true,
       }).then(() => {
-        // Navigate after alert is closed
         window.location.href = "/product";
       });
     } catch (err) {
       console.error("Error creating product:", err);
       setError(err.response?.data?.message || "Error creating product");
-      // Scroll to top to show error
       window.scrollTo({ top: 0, behavior: "smooth" });
 
-      // Show error SweetAlert
       Swal.fire({
         title: "Error!",
         text: err.response?.data?.message || "Error creating product",
@@ -262,6 +270,26 @@ const AddProduct = () => {
                     placeholder="Describe your product..."
                     required
                   />
+                </div>
+
+                {/* Product URL */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Product URL (Optional)
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Link className="text-gray-400" size={16} />
+                    </div>
+                    <input
+                      type="url"
+                      name="productUrl"
+                      value={formData.productUrl}
+                      onChange={handleInputChange}
+                      className="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      placeholder="https://example.com/product"
+                    />
+                  </div>
                 </div>
 
                 {/* Category */}
