@@ -26,6 +26,7 @@ import CategoryProductsPage from "./pages/CategoryProductsPage";
 import CategoryPage from "./pages/CategoryPage";
 import Business from "./pages/Business";
 import BusinessAdmin from "./pages/BusinessAdmin";
+import Market from "./pages/Market";
 
 const ScrollToTopButton = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -97,6 +98,7 @@ const AppContent = () => {
         <Route path="/verify-otp" element={<OTPVerify />} />
         <Route path="/become-business" element={<Business />} />
         <Route path="/business" element={<BusinessAdmin />} />
+        <Route path="/markets" element={<Market />} />
         <Route
           path="/category/:category/:subcategory"
           element={<CategoryProductsPage />}

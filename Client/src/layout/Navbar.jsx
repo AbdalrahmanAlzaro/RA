@@ -12,6 +12,7 @@ import {
   Package,
   PlusCircle,
   Briefcase,
+  Globe, // Adding a globe icon for "Markets" (optional)
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../assets/Logo.svg";
@@ -74,6 +75,16 @@ const Navbar = () => {
             >
               <PlusCircle size={18} />
               <span>Add Product</span>
+            </Link>
+
+            {/* Markets Link */}
+            <Link
+              to="/markets"
+              className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition-colors"
+            >
+              <Globe size={18} />{" "}
+              {/* Optional: a globe icon for the Markets link */}
+              <span>Markets</span>
             </Link>
 
             {/* Hide "Become a Business" if isAdmin */}
@@ -181,6 +192,16 @@ const Navbar = () => {
                 <span>Add Product</span>
               </Link>
 
+              {/* Markets Link */}
+              <Link
+                to="/markets"
+                className="flex items-center space-x-2 py-2 px-2 text-gray-700 hover:bg-gray-100 hover:text-indigo-600 rounded-lg transition-colors"
+              >
+                <Globe size={18} />{" "}
+                {/* Optional: a globe icon for the Markets link */}
+                <span>Markets</span>
+              </Link>
+
               {/* Hide "Become a Business" if isAdmin */}
               {!isAdmin && (
                 <Link
@@ -192,10 +213,9 @@ const Navbar = () => {
                 </Link>
               )}
 
-              {/* Business Dashboard Link - only for Admin */}
               {isAdmin && (
                 <Link
-                  to="/business "
+                  to="/business"
                   className="flex items-center space-x-2 py-2 px-2 text-gray-700 hover:bg-gray-100 hover:text-indigo-600 rounded-lg transition-colors"
                 >
                   <Briefcase size={18} />

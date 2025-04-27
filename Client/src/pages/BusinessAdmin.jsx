@@ -16,6 +16,7 @@ import {
   Clock,
   ExternalLink,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const BusinessAdmin = () => {
   const [business, setBusiness] = useState(null);
@@ -571,6 +572,16 @@ const BusinessAdmin = () => {
                       <Globe className="w-5 h-5 mr-2" />
                       Visit Website
                     </a>
+
+                    <Link
+                      to="/dashboard/shop/analytics"
+                      className="w-full flex items-center justify-center bg-white hover:bg-gray-50 text-indigo-600 border border-indigo-200 py-3 px-4 rounded-lg transition-colors shadow-sm"
+                    >
+                      <span className="flex items-center">
+                        View Analytics
+                        <ExternalLink className="ml-2 w-4 h-4" />
+                      </span>
+                    </Link>
                   </div>
 
                   {/* Subscription expiry warning if applicable */}

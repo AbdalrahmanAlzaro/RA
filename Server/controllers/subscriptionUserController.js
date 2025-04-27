@@ -1,4 +1,5 @@
 const { UserSubscription, Subscription, User } = require("../models");
+const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
 
@@ -153,8 +154,99 @@ const updateBusinessDetails = async (req, res) => {
   }
 };
 
+const getAllBusinesses = async (req, res) => {
+  try {
+    const businesses = await UserSubscription.findAll();
+
+    return res.status(200).json(businesses);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const updateBusinessStatus = async (req, res) => {
+  try {
+    const { businessId, status } = req.body;
+
+    if (!businessId) {
+      return res.status(400).json({ message: "Business ID is required" });
+    }
+
+    if (!["pending", "approved", "rejected"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+
+    const business = await UserSubscription.findOne({
+      where: { id: businessId },
+    });
+
+    if (!business) {
+      return res.status(404).json({ message: "Business not found" });
+    }
+
+    business.status = status;
+    await business.save();
+
+    const user = await User.findOne({
+      where: { id: business.userId },
+    });
+
+    if (user) {
+      user.role = "business";
+      await user.save();
+    }
+
+    await sendStatusUpdateEmail(business.businessEmail, status);
+
+    return res.status(200).json({
+      message: `Business status updated to ${status}, user role updated to 'business'`,
+      business,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const sendStatusUpdateEmail = async (userEmail, status) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const subject = `Your Business Subscription Status: ${status}`;
+    let text;
+    if (status === "approved") {
+      text = "Congratulations! Your business subscription has been approved.";
+    } else if (status === "rejected") {
+      text = "We're sorry, but your business subscription has been rejected.";
+    } else {
+      text =
+        "Your business subscription is still pending. We will notify you once it's approved.";
+    }
+
+    const info = await transporter.sendMail({
+      from: process.env.EMAIL_FROM,
+      to: userEmail,
+      subject: subject,
+      text: text,
+    });
+
+    console.log("Email sent: " + info.response);
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
+};
+
 module.exports = {
   createSubscription,
   getBusinessByToken,
   updateBusinessDetails,
+  getAllBusinesses,
+  updateBusinessStatus,
 };

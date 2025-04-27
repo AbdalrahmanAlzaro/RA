@@ -62,6 +62,11 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      rating: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+        defaultValue: 0,
+      },
       status: {
         type: Sequelize.ENUM("pending", "approved", "rejected"),
         defaultValue: "pending",
