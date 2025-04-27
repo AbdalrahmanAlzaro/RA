@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   } catch (err) {
     console.error("Error parsing user from localStorage:", err);
     parsedUser = null;
-    localStorage.removeItem("user"); // clean up bad data
+    localStorage.removeItem("user");
   }
 
   const [token, setToken] = useState(tokenFromStorage);

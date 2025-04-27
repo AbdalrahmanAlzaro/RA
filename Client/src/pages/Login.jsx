@@ -15,7 +15,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { login } = useAuth();
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,10 +38,17 @@ const Login = () => {
       });
 
       if (response.data.token && response.data.user) {
-        // Store token and user ID in localStorage via AuthContext
         login(response.data.token, response.data.user);
 
-        navigate("/"); // Navigate to the home page after successful login
+        const userRole = response.data.user.role;
+
+        if (userRole === "user") {
+          navigate("/");
+        } else if (userRole === "business") {
+          navigate("/business");
+        } else {
+          navigate("/");
+        }
       } else {
         setError(response.data.message || "Login failed");
       }

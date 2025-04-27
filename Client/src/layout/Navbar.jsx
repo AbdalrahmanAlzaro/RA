@@ -12,7 +12,7 @@ import {
   Package,
   PlusCircle,
   Briefcase,
-} from "lucide-react"; // Added Briefcase icon
+} from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../assets/Logo.svg";
 
@@ -20,6 +20,9 @@ const Navbar = () => {
   const { token, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+
+  const user = JSON.parse(localStorage.getItem("user"));
+  const isAdmin = user?.role === "business";
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -72,13 +75,29 @@ const Navbar = () => {
               <PlusCircle size={18} />
               <span>Add Product</span>
             </Link>
-            <Link
-              to="/become-business"
-              className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition-colors"
-            >
-              <Briefcase size={18} />
-              <span>Become a Business</span>
-            </Link>
+
+            {/* Hide "Become a Business" if isAdmin */}
+            {!isAdmin && (
+              <Link
+                to="/become-business"
+                className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition-colors"
+              >
+                <Briefcase size={18} />
+                <span>Become a Business</span>
+              </Link>
+            )}
+
+            {/* Business Dashboard Link - only for Admin */}
+            {isAdmin && (
+              <Link
+                to="/business"
+                className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition-colors"
+              >
+                <Briefcase size={18} />
+                <span>Business Dashboard</span>
+              </Link>
+            )}
+
             <Link
               to="/about"
               className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition-colors"
@@ -161,13 +180,29 @@ const Navbar = () => {
                 <PlusCircle size={18} />
                 <span>Add Product</span>
               </Link>
-              <Link
-                to="/become-business"
-                className="flex items-center space-x-2 py-2 px-2 text-gray-700 hover:bg-gray-100 hover:text-indigo-600 rounded-lg transition-colors"
-              >
-                <Briefcase size={18} />
-                <span>Become a Business</span>
-              </Link>
+
+              {/* Hide "Become a Business" if isAdmin */}
+              {!isAdmin && (
+                <Link
+                  to="/become-business"
+                  className="flex items-center space-x-2 py-2 px-2 text-gray-700 hover:bg-gray-100 hover:text-indigo-600 rounded-lg transition-colors"
+                >
+                  <Briefcase size={18} />
+                  <span>Become a Business</span>
+                </Link>
+              )}
+
+              {/* Business Dashboard Link - only for Admin */}
+              {isAdmin && (
+                <Link
+                  to="/business "
+                  className="flex items-center space-x-2 py-2 px-2 text-gray-700 hover:bg-gray-100 hover:text-indigo-600 rounded-lg transition-colors"
+                >
+                  <Briefcase size={18} />
+                  <span>Business Dashboard</span>
+                </Link>
+              )}
+
               <Link
                 to="/about"
                 className="flex items-center space-x-2 py-2 px-2 text-gray-700 hover:bg-gray-100 hover:text-indigo-600 rounded-lg transition-colors"

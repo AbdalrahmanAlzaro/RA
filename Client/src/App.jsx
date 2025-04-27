@@ -25,6 +25,7 @@ import { ArrowUp } from "lucide-react";
 import CategoryProductsPage from "./pages/CategoryProductsPage";
 import CategoryPage from "./pages/CategoryPage";
 import Business from "./pages/Business";
+import BusinessAdmin from "./pages/BusinessAdmin";
 
 const ScrollToTopButton = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -95,6 +96,7 @@ const AppContent = () => {
         <Route path="/oauth-success" element={<OAuthSuccessWrapper />} />
         <Route path="/verify-otp" element={<OTPVerify />} />
         <Route path="/become-business" element={<Business />} />
+        <Route path="/business" element={<BusinessAdmin />} />
         <Route
           path="/category/:category/:subcategory"
           element={<CategoryProductsPage />}
