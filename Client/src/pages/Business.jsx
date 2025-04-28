@@ -20,6 +20,7 @@ import {
   ArrowRight,
   CheckCircle,
   XCircle,
+  ChevronDown,
 } from "lucide-react";
 
 const Business = () => {
@@ -37,7 +38,52 @@ const Business = () => {
     businessDescription: "",
     businessWebsiteUrl: "",
     mainImage: null,
+    category: "",
+    subcategory: "",
   });
+
+  const categories = {
+    Restaurants: [
+      "TakeOut",
+      "Thai",
+      "Delivery",
+      "Burgers",
+      "Chinese",
+      "Italian",
+      "Reservation",
+      "Mexican",
+    ],
+    Services: [
+      "Cleaning",
+      "Plumbing",
+      "Electrical",
+      "Landscaping",
+      "Carpentry",
+      "Moving",
+      "Handyman",
+      "Design",
+    ],
+    AutoServices: [
+      "CarMaintenance",
+      "TireChange",
+      "EngineRepair",
+      "OilChange",
+      "BrakeService",
+      "Detailing",
+      "Inspection",
+      "EmergencyTowing",
+    ],
+    More: [
+      "DryCleaning",
+      "PhoneRepair",
+      "Cafes",
+      "OutdoorActivities",
+      "HairSalons",
+      "Gyms",
+      "Spas",
+      "Shopping",
+    ],
+  };
 
   useEffect(() => {
     const fetchSubscriptions = async () => {
@@ -73,7 +119,12 @@ const Business = () => {
 
   const handleBusinessDetailChange = (e) => {
     const { name, value } = e.target;
-    setBusinessDetails({ ...businessDetails, [name]: value });
+    setBusinessDetails({
+      ...businessDetails,
+      [name]: value,
+      // Reset subcategory when category changes
+      ...(name === "category" ? { subcategory: "" } : {}),
+    });
   };
 
   const handleImageChange = (e) => {
@@ -91,6 +142,7 @@ const Business = () => {
     if (!businessDetails.businessName) return false;
     if (!businessDetails.businessEmail) return false;
     if (!businessDetails.businessPhone) return false;
+    if (!businessDetails.category) return false;
     return true;
   };
 
@@ -121,6 +173,8 @@ const Business = () => {
     formData.append("businessName", businessDetails.businessName);
     formData.append("businessEmail", businessDetails.businessEmail);
     formData.append("businessPhone", businessDetails.businessPhone || "");
+    formData.append("category", businessDetails.category);
+    formData.append("subcategory", businessDetails.subcategory || "");
     formData.append(
       "businessDescription",
       businessDetails.businessDescription || ""
@@ -161,6 +215,8 @@ const Business = () => {
           businessDescription: "",
           businessWebsiteUrl: "",
           mainImage: null,
+          category: "",
+          subcategory: "",
         });
         setPreviewImage(null);
 
@@ -215,7 +271,7 @@ const Business = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="container mx-auto px-4">
-        <div className="px-32 mx-auto">
+        <div className="px-4 lg:px-32 mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-indigo-700 mb-4">
@@ -531,6 +587,70 @@ const Business = () => {
                       </div>
                     </div>
 
+                    {/* Category */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Business Category{" "}
+                        <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative rounded-md shadow-sm">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <BarChart className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <select
+                          name="category"
+                          value={businessDetails.category}
+                          onChange={handleBusinessDetailChange}
+                          className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
+                          required
+                        >
+                          <option value="">Select a category</option>
+                          {Object.keys(categories).map((category) => (
+                            <option key={category} value={category}>
+                              {category}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                          <ChevronDown className="h-5 w-5 text-gray-400" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Subcategory */}
+                    {businessDetails.category && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Business Subcategory
+                        </label>
+                        <div className="relative rounded-md shadow-sm">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <BarChart className="h-5 w-5 text-gray-400" />
+                          </div>
+                          <select
+                            name="subcategory"
+                            value={businessDetails.subcategory}
+                            onChange={handleBusinessDetailChange}
+                            className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
+                          >
+                            <option value="">
+                              Select a subcategory (optional)
+                            </option>
+                            {categories[businessDetails.category]?.map(
+                              (subcategory) => (
+                                <option key={subcategory} value={subcategory}>
+                                  {subcategory}
+                                </option>
+                              )
+                            )}
+                          </select>
+                          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <ChevronDown className="h-5 w-5 text-gray-400" />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Business Description */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -673,6 +793,20 @@ const Business = () => {
                             : selectedSubscription.priceYearly}
                         </span>
                       </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Category:</span>
+                        <span className="font-medium">
+                          {businessDetails.category}
+                        </span>
+                      </div>
+                      {businessDetails.subcategory && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Subcategory:</span>
+                          <span className="font-medium">
+                            {businessDetails.subcategory}
+                          </span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="pt-4 border-t border-gray-200">

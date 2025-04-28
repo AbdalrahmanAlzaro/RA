@@ -6,6 +6,7 @@ const {
   updateBusinessDetails,
   getAllBusinesses,
   updateBusinessStatus,
+  getActiveBusiness,
 } = require("../controllers/subscriptionUserController");
 const upload = require("../utils/multer");
 
@@ -22,5 +23,7 @@ router.put(
 router.get("/get-all-businesses", getAllBusinesses);
 
 router.put("/update-status", updateBusinessStatus);
+
+router.get("/get-active-business", getActiveBusiness);
 
 module.exports = router;

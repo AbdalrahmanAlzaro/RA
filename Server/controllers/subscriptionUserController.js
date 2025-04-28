@@ -2,6 +2,7 @@ const { UserSubscription, Subscription, User } = require("../models");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
+const { Op } = require("sequelize");
 
 const createSubscription = async (req, res) => {
   try {
@@ -28,6 +29,8 @@ const createSubscription = async (req, res) => {
       businessPhone,
       businessDescription,
       businessWebsiteUrl,
+      category,
+      subcategory,
     } = req.body;
 
     const subscription = await Subscription.findByPk(subscriptionId);
@@ -61,6 +64,8 @@ const createSubscription = async (req, res) => {
       businessPhone,
       businessDescription,
       businessWebsiteUrl,
+      category,
+      subcategory,
       status: "pending",
       mainImage,
     });
@@ -129,6 +134,8 @@ const updateBusinessDetails = async (req, res) => {
       businessPhone,
       businessDescription,
       businessWebsiteUrl,
+      category,
+      subcategory,
     } = req.body;
 
     if (businessName !== undefined) business.businessName = businessName;
@@ -138,6 +145,9 @@ const updateBusinessDetails = async (req, res) => {
       business.businessDescription = businessDescription;
     if (businessWebsiteUrl !== undefined)
       business.businessWebsiteUrl = businessWebsiteUrl;
+
+    if (category !== undefined) business.category = category;
+    if (subcategory !== undefined) business.subcategory = subcategory;
 
     if (req.file) {
       business.mainImage = `/uploads/${req.file.filename}`;
@@ -243,10 +253,44 @@ const sendStatusUpdateEmail = async (userEmail, status) => {
   }
 };
 
+const getActiveBusiness = async (req, res) => {
+  try {
+    const { name, category, subcategory } = req.query;
+
+    const whereClause = { status: "approved" };
+
+    if (name) {
+      whereClause.businessName = { [Op.iLike]: `%${name}%` };
+    }
+
+    if (category) {
+      whereClause.category = category;
+    }
+
+    if (subcategory) {
+      whereClause.subcategory = subcategory;
+    }
+
+    const activeBusinesses = await UserSubscription.findAll({
+      where: whereClause,
+    });
+
+    if (!activeBusinesses || activeBusinesses.length === 0) {
+      return res.status(404).json({ message: "No active businesses found" });
+    }
+
+    return res.status(200).json(activeBusinesses);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   createSubscription,
   getBusinessByToken,
   updateBusinessDetails,
   getAllBusinesses,
   updateBusinessStatus,
+  getActiveBusiness,
 };

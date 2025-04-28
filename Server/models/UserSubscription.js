@@ -61,10 +61,13 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      rating: {
-        type: DataTypes.FLOAT,
+      category: {
+        type: DataTypes.STRING,
         allowNull: true,
-        defaultValue: 0,
+      },
+      subcategory: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
       status: {
         type: DataTypes.ENUM("pending", "approved", "rejected"),

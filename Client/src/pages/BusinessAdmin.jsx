@@ -15,6 +15,8 @@ import {
   Upload,
   Clock,
   ExternalLink,
+  Star,
+  Tag,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -29,9 +31,54 @@ const BusinessAdmin = () => {
     businessPhone: "",
     businessDescription: "",
     businessWebsiteUrl: "",
+    category: "",
+    subcategory: "",
   });
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
+
+  const categories = {
+    Restaurants: [
+      "TakeOut",
+      "Thai",
+      "Delivery",
+      "Burgers",
+      "Chinese",
+      "Italian",
+      "Reservation",
+      "Mexican",
+    ],
+    Services: [
+      "Cleaning",
+      "Plumbing",
+      "Electrical",
+      "Landscaping",
+      "Carpentry",
+      "Moving",
+      "Handyman",
+      "Design",
+    ],
+    AutoServices: [
+      "CarMaintenance",
+      "TireChange",
+      "EngineRepair",
+      "OilChange",
+      "BrakeService",
+      "Detailing",
+      "Inspection",
+      "EmergencyTowing",
+    ],
+    More: [
+      "DryCleaning",
+      "PhoneRepair",
+      "Cafes",
+      "OutdoorActivities",
+      "HairSalons",
+      "Gyms",
+      "Spas",
+      "Shopping",
+    ],
+  };
 
   useEffect(() => {
     const fetchBusiness = async () => {
@@ -51,6 +98,8 @@ const BusinessAdmin = () => {
           businessPhone: response.data.businessPhone,
           businessDescription: response.data.businessDescription,
           businessWebsiteUrl: response.data.businessWebsiteUrl,
+          category: response.data.category || "",
+          subcategory: response.data.subcategory || "",
         });
       } catch (err) {
         console.error(err);
@@ -64,9 +113,12 @@ const BusinessAdmin = () => {
   }, []);
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: value,
+      // Reset subcategory when category changes
+      ...(name === "category" ? { subcategory: "" } : {}),
     }));
   };
 
@@ -87,6 +139,8 @@ const BusinessAdmin = () => {
     data.append("businessPhone", formData.businessPhone);
     data.append("businessDescription", formData.businessDescription);
     data.append("businessWebsiteUrl", formData.businessWebsiteUrl);
+    data.append("category", formData.category);
+    data.append("subcategory", formData.subcategory || "");
     if (selectedFile) {
       data.append("mainImage", selectedFile);
     }
@@ -185,10 +239,10 @@ const BusinessAdmin = () => {
       <div className="max-w-5xl mx-auto">
         <div className="bg-white overflow-hidden shadow rounded-t-2xl">
           <div className="relative h-48 bg-gradient-to-r from-indigo-600 to-purple-600">
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-self-center">
               <h1 className="text-white text-3xl font-bold drop-shadow-md">
                 {business.businessName}
-              </h1>
+              </h1>{" "}
             </div>
             <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2">
               <div className="h-36 w-[30rem] rounded-xl border-4 border-white overflow-hidden bg-white shadow-lg">
@@ -301,6 +355,63 @@ const BusinessAdmin = () => {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Category <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative rounded-md shadow-sm">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <Tag className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <select
+                          name="category"
+                          value={formData.category}
+                          onChange={handleChange}
+                          className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border"
+                          required
+                        >
+                          <option value="">Select a category</option>
+                          {Object.keys(categories).map((category) => (
+                            <option key={category} value={category}>
+                              {category}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    {formData.category && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Subcategory
+                        </label>
+                        <div className="relative rounded-md shadow-sm">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Tag className="h-5 w-5 text-gray-400" />
+                          </div>
+                          <select
+                            name="subcategory"
+                            value={formData.subcategory}
+                            onChange={handleChange}
+                            className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border"
+                          >
+                            <option value="">
+                              Select a subcategory (optional)
+                            </option>
+                            {categories[formData.category]?.map(
+                              (subcategory) => (
+                                <option key={subcategory} value={subcategory}>
+                                  {subcategory}
+                                </option>
+                              )
+                            )}
+                          </select>
+                        </div>
+                      </div>
+                    )}
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Website URL
                       </label>
                       <div className="relative rounded-md shadow-sm">
@@ -317,9 +428,7 @@ const BusinessAdmin = () => {
                         />
                       </div>
                     </div>
-                  </div>
 
-                  <div className="space-y-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Shop Description
@@ -427,6 +536,28 @@ const BusinessAdmin = () => {
                       </p>
                     </div>
 
+                    <div>
+                      <p className="text-sm text-gray-500">Category</p>
+                      <div className="flex items-center">
+                        <Tag className="text-gray-400 w-4 h-4 mr-2" />
+                        <span className="font-medium">
+                          {business.category || "Not specified"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {business.subcategory && (
+                      <div>
+                        <p className="text-sm text-gray-500">Subcategory</p>
+                        <div className="flex items-center">
+                          <Tag className="text-gray-400 w-4 h-4 mr-2" />
+                          <span className="font-medium">
+                            {business.subcategory}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="flex items-center">
                       <Mail className="text-gray-400 w-4 h-4 mr-2" />
                       <a
@@ -450,7 +581,7 @@ const BusinessAdmin = () => {
                     <div className="flex items-center">
                       <Globe className="text-gray-400 w-4 h-4 mr-2" />
                       <a
-                        href={`https://${business.businessWebsiteUrl}`}
+                        href={`${business.businessWebsiteUrl}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-indigo-600 hover:text-indigo-700 flex items-center"
@@ -553,8 +684,8 @@ const BusinessAdmin = () => {
                   <h2 className="text-xl font-semibold text-gray-800 mb-4">
                     Quick Actions
                   </h2>
-
-                  <div className="space-y-3">
+                  <br />
+                  <div className="space-y-3 ">
                     <button
                       onClick={() => setEditing(true)}
                       className="w-full flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-lg transition-colors shadow-md"
@@ -562,9 +693,10 @@ const BusinessAdmin = () => {
                       <Edit2 className="w-5 h-5 mr-2" />
                       Edit Shop Details
                     </button>
-
+                    <br />
+                    <br />
                     <a
-                      href={`https://${business.businessWebsiteUrl}`}
+                      href={`${business.businessWebsiteUrl}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full flex items-center justify-center bg-white hover:bg-gray-50 text-indigo-600 border border-indigo-200 py-3 px-4 rounded-lg transition-colors shadow-sm"
@@ -572,7 +704,8 @@ const BusinessAdmin = () => {
                       <Globe className="w-5 h-5 mr-2" />
                       Visit Website
                     </a>
-
+                    <br />
+                    <br />
                     <Link
                       to="/dashboard/shop/analytics"
                       className="w-full flex items-center justify-center bg-white hover:bg-gray-50 text-indigo-600 border border-indigo-200 py-3 px-4 rounded-lg transition-colors shadow-sm"
@@ -583,29 +716,6 @@ const BusinessAdmin = () => {
                       </span>
                     </Link>
                   </div>
-
-                  {/* Subscription expiry warning if applicable */}
-                  {new Date(business.endDate) <
-                    new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) && (
-                    <div className="mt-6 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
-                      <div className="flex">
-                        <AlertCircle className="h-5 w-5 text-yellow-400" />
-                        <div className="ml-3">
-                          <p className="text-sm text-yellow-700">
-                            Your subscription will expire soon. Renew now to
-                            avoid service interruption.
-                          </p>
-                          <a
-                            href="/dashboard/subscription/renew"
-                            className="mt-2 inline-flex items-center text-sm font-medium text-yellow-700 hover:text-yellow-600"
-                          >
-                            Renew subscription
-                            <span className="ml-1">→</span>
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
