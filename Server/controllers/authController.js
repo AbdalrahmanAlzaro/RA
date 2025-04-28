@@ -149,7 +149,7 @@ const authController = {
       const token = generateToken(user);
       res.status(200).json({
         token,
-        user: { id: user.id, email: user.email, role: user, role },
+        user: { id: user.id, email: user.email },
       });
     } catch (error) {
       res

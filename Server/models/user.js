@@ -19,6 +19,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "userId",
         onDelete: "CASCADE",
       });
+      User.hasMany(models.ServiceReview, {
+        foreignKey: "userId",
+        as: "serviceReviews",
+      });
     }
   }
   User.init(

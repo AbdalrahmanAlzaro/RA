@@ -1,47 +1,51 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import {
-  Calendar,
-  Clock,
-  Briefcase,
-  Image as ImageIcon,
-  Loader,
-  AlertCircle,
-  ArrowLeft,
-  Share2,
-  Heart,
-  MessageSquare,
-} from "lucide-react";
+import { Calendar, Clock, Loader, AlertCircle, ArrowLeft } from "lucide-react";
 
 const ProductMarketsDetails = () => {
   const { id } = useParams();
   const [service, setService] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [newReview, setNewReview] = useState({
+    title: "",
+    description: "",
+    rating: 1,
+  });
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [activeImage, setActiveImage] = useState(null);
   const [liked, setLiked] = useState(false);
 
   useEffect(() => {
-    const fetchService = async () => {
+    const fetchServiceAndReviews = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
+
+        // Fetch service details
+        const serviceResponse = await axios.get(
           `http://localhost:4000/api/services/service/${id}`
         );
-        setService(response.data);
+        setService(serviceResponse.data);
         setActiveImage(
-          `http://localhost:4000/uploads/${response.data.mainImage}`
+          `http://localhost:4000/uploads/${serviceResponse.data.mainImage}`
         );
+
+        // Fetch service reviews
+        const reviewsResponse = await axios.get(
+          `http://localhost:4000/api/reviews/service/${id}`
+        );
+        setReviews(reviewsResponse.data.reviews);
       } catch (error) {
-        console.error("Error fetching service:", error);
+        console.error("Error fetching service or reviews:", error);
         setError("Failed to load service details. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchService();
+    fetchServiceAndReviews();
   }, [id]);
 
   const handleSubImageClick = (url) => {
@@ -50,6 +54,50 @@ const ProductMarketsDetails = () => {
 
   const toggleLike = () => {
     setLiked(!liked);
+  };
+
+  const handleReviewChange = (e) => {
+    setNewReview({ ...newReview, [e.target.name]: e.target.value });
+  };
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+
+    try {
+      const token = localStorage.getItem("token"); // Assuming you saved it in localStorage
+      if (!token) {
+        throw new Error("User is not authenticated.");
+      }
+
+      await axios.post(
+        "http://localhost:4000/api/reviews/services/create",
+        {
+          serviceId: id,
+          title: newReview.title,
+          description: newReview.description,
+          rating: newReview.rating,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Refresh reviews after successful submit
+      const reviewsResponse = await axios.get(
+        `http://localhost:4000/api/reviews/service/${id}`
+      );
+      setReviews(reviewsResponse.data.reviews);
+
+      setNewReview({ title: "", description: "", rating: 1 }); // Reset form
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      alert("Failed to submit review. Please login and try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (loading) {
@@ -193,6 +241,90 @@ const ProductMarketsDetails = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Reviews Section */}
+      <div className="mt-12">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">
+          Customer Reviews
+        </h2>
+
+        {reviews.length === 0 ? (
+          <p className="text-gray-500">
+            No reviews yet. Be the first to review!
+          </p>
+        ) : (
+          <div className="space-y-6">
+            {reviews.map((review) => (
+              <div key={review.id} className="bg-white shadow p-6 rounded-lg">
+                <div className="flex justify-between items-center mb-2">
+                  <div className="text-lg font-semibold">
+                    {review.user?.name || "Anonymous"}
+                  </div>
+                  <div className="text-sm text-gray-400">
+                    {new Date(review.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+                <div className="font-medium text-primary">{review.title}</div>
+                <p className="text-gray-600 mt-2">{review.description}</p>
+                <div className="mt-2">
+                  <span className="text-yellow-500">
+                    {"★".repeat(review.rating)}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Add Review Form */}
+      <div className="mt-12">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">
+          Leave a Review
+        </h2>
+        <form onSubmit={handleReviewSubmit} className="space-y-4">
+          <input
+            type="text"
+            name="title"
+            placeholder="Review Title"
+            value={newReview.title}
+            onChange={handleReviewChange}
+            required
+            className="w-full border border-gray-300 rounded-lg p-3"
+          />
+          <textarea
+            name="description"
+            placeholder="Your review"
+            value={newReview.description}
+            onChange={handleReviewChange}
+            required
+            rows="4"
+            className="w-full border border-gray-300 rounded-lg p-3"
+          />
+          <div className="flex items-center space-x-4">
+            <label className="text-gray-700">Rating:</label>
+            <select
+              name="rating"
+              value={newReview.rating}
+              onChange={handleReviewChange}
+              className="border border-gray-300 rounded-lg p-2"
+            >
+              {[1, 2, 3, 4, 5].map((rating) => (
+                <option key={rating} value={rating}>
+                  {rating} Star{rating > 1 ? "s" : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button
+            type="submit"
+            disabled={submitting}
+            className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-dark transition-colors"
+          >
+            {submitting ? "Submitting..." : "Submit Review"}
+          </button>
+        </form>
       </div>
     </div>
   );

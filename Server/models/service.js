@@ -20,6 +20,10 @@ module.exports = (sequelize, DataTypes) => {
 
   Service.associate = function (models) {
     Service.belongsTo(models.UserSubscription, { foreignKey: "businessId" });
+    Service.hasMany(models.ServiceReview, {
+      foreignKey: "serviceId",
+      as: "serviceReviews",
+    });
   };
 
   return Service;
