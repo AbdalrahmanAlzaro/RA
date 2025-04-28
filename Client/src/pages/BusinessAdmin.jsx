@@ -234,6 +234,8 @@ const BusinessAdmin = () => {
     }
   };
 
+  console.log(business.businessWebsiteUrl);
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
@@ -581,7 +583,7 @@ const BusinessAdmin = () => {
                     <div className="flex items-center">
                       <Globe className="text-gray-400 w-4 h-4 mr-2" />
                       <a
-                        href={`${business.businessWebsiteUrl}`}
+                        href={`https://${business.businessWebsiteUrl}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-indigo-600 hover:text-indigo-700 flex items-center"
@@ -696,7 +698,7 @@ const BusinessAdmin = () => {
                     <br />
                     <br />
                     <a
-                      href={`${business.businessWebsiteUrl}`}
+                      href={`https://${business.businessWebsiteUrl}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full flex items-center justify-center bg-white hover:bg-gray-50 text-indigo-600 border border-indigo-200 py-3 px-4 rounded-lg transition-colors shadow-sm"
@@ -704,6 +706,7 @@ const BusinessAdmin = () => {
                       <Globe className="w-5 h-5 mr-2" />
                       Visit Website
                     </a>
+
                     <br />
                     <br />
                     <Link

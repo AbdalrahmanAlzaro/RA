@@ -286,6 +286,29 @@ const getActiveBusiness = async (req, res) => {
   }
 };
 
+const getBusinessById = async (req, res) => {
+  try {
+    const { businessId } = req.params;
+
+    if (!businessId) {
+      return res.status(400).json({ message: "Business ID is required" });
+    }
+
+    const business = await UserSubscription.findOne({
+      where: { id: businessId },
+    });
+
+    if (!business) {
+      return res.status(404).json({ message: "Business not found" });
+    }
+
+    return res.status(200).json(business);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   createSubscription,
   getBusinessByToken,
@@ -293,4 +316,5 @@ module.exports = {
   getAllBusinesses,
   updateBusinessStatus,
   getActiveBusiness,
+  getBusinessById,
 };

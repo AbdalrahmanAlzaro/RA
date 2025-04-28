@@ -12,6 +12,7 @@ const reviewRoutes = require("./routes/reviewRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const subscriptionRoutes = require("./routes/subscriptionRoutes");
 const subscriptionUserRoutes = require("./routes/subscriptionUserRoutes");
+const reviewBusinessRoutes = require("./routes/reviewBusinessRoutes");
 
 dotenv.config();
 
@@ -49,6 +50,7 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api", reportRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/subscriptions/user", subscriptionUserRoutes);
+app.use("/api", reviewBusinessRoutes);
 
 app.get("/", (req, res) => {
   res.send("Backend is running!");

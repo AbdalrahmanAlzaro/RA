@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Store, Phone, ChevronRight, AlertCircle, Loader2 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const categories = {
   Restaurants: [
@@ -135,7 +136,7 @@ const Market = () => {
   return (
     <div className="container mx-auto p-6 bg-gray-50 min-h-screen">
       <div className="flex items-center justify-center mb-8">
-        <Store className="w-6 h-6 text-blue-600 mr-2" />
+        <Store className="w-6 h-6 text-indigo-600 mr-2" />
         <h1 className="text-3xl font-bold text-gray-800">Market</h1>
       </div>
 
@@ -156,7 +157,7 @@ const Market = () => {
           />
           <button
             onClick={handleSearch}
-            className="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 transition duration-300"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-r-lg  transition duration-300"
           >
             Search
           </button>
@@ -243,7 +244,7 @@ const Market = () => {
                   alt={business.businessName}
                   className="w-full h-64 object-cover"
                 />
-                <div className="absolute top-4 right-4 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                <div className="absolute top-4 right-4 bg-indigo-600  text-white px-3 py-1 rounded-full text-sm font-medium">
                   Active
                 </div>
               </div>
@@ -266,14 +267,13 @@ const Market = () => {
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <button className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition duration-300 flex items-center font-medium">
+                  <Link
+                    to={`/business/${business.id}`}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-6 rounded-lg  transition duration-300 flex items-center font-medium"
+                  >
                     View Details
                     <ChevronRight className="w-4 h-4 ml-1" />
-                  </button>
-
-                  <button className="border border-blue-500 text-blue-500 py-2 px-4 rounded-lg hover:bg-blue-50 transition duration-300 font-medium">
-                    Contact
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
