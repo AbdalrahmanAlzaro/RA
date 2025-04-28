@@ -16,6 +16,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "businessId",
         onDelete: "CASCADE",
       });
+      UserSubscription.hasMany(models.Service, {
+        foreignKey: "businessId",
+        onDelete: "CASCADE",
+      });
     }
   }
 

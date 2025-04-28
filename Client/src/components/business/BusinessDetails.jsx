@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import BusinessReview from "./BusinessReview";
-import { Mail, Phone, Globe, Eye, Building, Tag, Star } from "lucide-react"; // Added Star icon
+import { Mail, Phone, Globe, Eye, Building, Tag, Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const BusinessDetails = ({ id }) => {
   const [businessData, setBusinessData] = useState(null);
   const [reviewStats, setReviewStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBusinessData = async () => {
@@ -19,7 +21,6 @@ const BusinessDetails = ({ id }) => {
         );
         setBusinessData(businessResponse.data);
 
-        // Then separately try to fetch review stats
         try {
           const statsResponse = await axios.get(
             `http://localhost:4000/api/reviews/business/${id}/stats`
@@ -41,7 +42,7 @@ const BusinessDetails = ({ id }) => {
   }, [id]);
 
   const handleViewProduct = () => {
-    window.open(`/products/${id}`, "_blank");
+    navigate(`/products-market/${id}`);
   };
 
   if (loading) {

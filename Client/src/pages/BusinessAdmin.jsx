@@ -234,7 +234,7 @@ const BusinessAdmin = () => {
     }
   };
 
-  console.log(business.businessWebsiteUrl);
+  console.log(business.id);
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -583,7 +583,7 @@ const BusinessAdmin = () => {
                     <div className="flex items-center">
                       <Globe className="text-gray-400 w-4 h-4 mr-2" />
                       <a
-                        href={`https://${business.businessWebsiteUrl}`}
+                        href={`${business.businessWebsiteUrl}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-indigo-600 hover:text-indigo-700 flex items-center"
@@ -698,7 +698,7 @@ const BusinessAdmin = () => {
                     <br />
                     <br />
                     <a
-                      href={`https://${business.businessWebsiteUrl}`}
+                      href={`${business.businessWebsiteUrl}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full flex items-center justify-center bg-white hover:bg-gray-50 text-indigo-600 border border-indigo-200 py-3 px-4 rounded-lg transition-colors shadow-sm"
@@ -710,7 +710,7 @@ const BusinessAdmin = () => {
                     <br />
                     <br />
                     <Link
-                      to="/dashboard/shop/analytics"
+                      to={`/analytics/${business.id}`}
                       className="w-full flex items-center justify-center bg-white hover:bg-gray-50 text-indigo-600 border border-indigo-200 py-3 px-4 rounded-lg transition-colors shadow-sm"
                     >
                       <span className="flex items-center">

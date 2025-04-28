@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { Navigate } from "react-router-dom";
+
 import {
   BrowserRouter as Router,
   Route,
@@ -28,6 +30,9 @@ import Business from "./pages/Business";
 import BusinessAdmin from "./pages/BusinessAdmin";
 import Market from "./pages/Market";
 import ViewBusinessDetails from "./pages/ViewBusinessDetails";
+import Analytics from "./pages/Analytics";
+import ProductMarkets from "./pages/ProductMarkets";
+import ProductMarketsDetails from "./pages/ProductMarketsDetails";
 
 const ScrollToTopButton = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -80,6 +85,10 @@ const AppContent = () => {
     location.pathname.startsWith(path)
   );
 
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  const isUser = user?.role === "user";
+
   return (
     <>
       {!shouldHideNavbarFooter && <Navbar />}
@@ -98,9 +107,27 @@ const AppContent = () => {
         <Route path="/oauth-success" element={<OAuthSuccessWrapper />} />
         <Route path="/verify-otp" element={<OTPVerify />} />
         <Route path="/become-business" element={<Business />} />
-        <Route path="/business" element={<BusinessAdmin />} />
         <Route path="/markets" element={<Market />} />
+        <Route path="/products-market/:id" element={<ProductMarkets />} />
         <Route path="/business/:id" element={<ViewBusinessDetails />} />
+        <Route
+          path="/product-market-details/:id"
+          element={<ProductMarketsDetails />}
+        />
+        {!isUser && (
+          <>
+            <Route path="/analytics/:businessId" element={<Analytics />} />
+            <Route path="/business" element={<BusinessAdmin />} />
+          </>
+        )}
+        <Route
+          path="/analytics/:businessId"
+          element={isUser ? <Navigate to="/" replace /> : <Analytics />}
+        />
+        <Route
+          path="/business"
+          element={isUser ? <Navigate to="/" replace /> : <BusinessAdmin />}
+        />
         <Route
           path="/category/:category/:subcategory"
           element={<CategoryProductsPage />}

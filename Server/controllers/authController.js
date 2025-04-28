@@ -25,6 +25,7 @@ passport.use(
             googleId: profile.id,
             name: profile.displayName,
             email: profile.emails?.[0]?.value,
+            role: "user",
           });
         }
 
@@ -54,6 +55,7 @@ passport.use(
             facebookId: profile.id,
             name: profile.displayName,
             email: profile.emails?.[0]?.value || `${profile.id}@facebook.com`,
+            role: "user",
           });
         }
 
@@ -145,7 +147,10 @@ const authController = {
       await user.save();
 
       const token = generateToken(user);
-      res.status(200).json({ token, user: { id: user.id, email: user.email } });
+      res.status(200).json({
+        token,
+        user: { id: user.id, email: user.email, role: user, role },
+      });
     } catch (error) {
       res
         .status(500)
@@ -188,12 +193,10 @@ const authController = {
       }
 
       const token = generateToken(user);
-      res
-        .status(200)
-        .json({
-          token,
-          user: { id: user.id, email: user.email, role: user.role },
-        });
+      res.status(200).json({
+        token,
+        user: { id: user.id, email: user.email, role: user.role },
+      });
     } catch (error) {
       res
         .status(500)
@@ -280,6 +283,7 @@ const authController = {
         id: req.user.id,
         name: req.user.name,
         email: req.user.email,
+        role: req.user.role,
       };
 
       const userEncoded = encodeURIComponent(JSON.stringify(user));
@@ -302,6 +306,7 @@ const authController = {
         id: req.user.id,
         name: req.user.name,
         email: req.user.email,
+        role: req.user.role,
       };
 
       const userEncoded = encodeURIComponent(JSON.stringify(user));
